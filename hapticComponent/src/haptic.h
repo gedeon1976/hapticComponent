@@ -35,26 +35,67 @@ public:
 	~Haptic();
 
 	void Init(bool &init);
-	bool calibrate();
-	bool start();
-	bool stop();
-	bool getPositionTX(mt::Transform &);
-	bool getPosition(mt::Transform &);
-	bool getVelocity(Vect6 &);
-	bool setForce(const Vect6);
-	bool getButtom();
-	bool getJointPosition(Vect6 &);
-	bool setMotorTorque(const Vect6);
-	bool getJacobian(ublas::matrix<mt::Scalar> &);
-	bool getJacobianTranspose(ublas::matrix<mt::Scalar> &);
-	bool SetWorkSpaceLimits(mt::Vector3 minCubeLimits, mt::Vector3 maxCubeLimits);
+	void startConnection();	
+	bool setWorkSpaceLimits(mt::Vector3 minCubeLimits, mt::Vector3 maxCubeLimits);
+	void getWorkSpaceLimits(mt::Vector3 MinCubicLimits, mt::Vector3 MaxCubicLimits);
+	void getHapticPosition(mt::Transform &hapticPosition);
+	void closeConnection();
 
 
-public:
+private:
 	HHD m_hHD;
 	HDErrorInfo m_error;
 	HapticState *m_phState;
 	bool m_init;
+
+	bool hapticStatus;
+	mt::Transform HapticPosition;
+	mt::Vector3 position;
+	mt::Rotation orientation;
+
+	/// calibrate the haptic device
+	bool calibrate();
+
+	/// start the haptic device
+	bool start();
+
+	/// stop the haptic device
+	bool stop();
+
+	/// old Function, not used	
+	bool getPositionTX(mt::Transform &);
+
+	/// get the position Xh,Yh,Zh on haptic coordinates
+	/// @param[in,out]	mt::Transform it saves the 3 vector haptic position
+	bool getPosition(mt::Transform &);
+
+	/// get the velocity of each joint
+	/// @param[in,out] Vect6 contains the speeds of haptic Pose and torque joints
+	bool getVelocity(Vect6 &);
+
+	/// set the force at the haptic pose and torque joints
+	/// @param[in,out] const Vect6 it contains the forces to be set to the haptic
+	bool setForce(const Vect6);
+
+	/// get the state of the stylus button
+	bool getButton();
+
+	/// get the position of the joints
+	/// @param[in,out] Vect6 it contains the position of each joint of the haptic
+	bool getJointPosition(Vect6 &);
+
+	/// set the torque to each torque
+	/// @param[in,out] Vect6 it contains the torque to be set at each joint motor
+	bool setMotorTorque(const Vect6);
+
+	/// get the jacobian 
+	/// @param[in,out] ublas::matrix<mt::Scalar> Matrix that contains the Jacobian
+	bool getJacobian(ublas::matrix<mt::Scalar> &);
+
+	/// get the jacobian Transpose 
+	bool getJacobianTranspose(ublas::matrix<mt::Scalar> &);
+
+	
 };
 
 

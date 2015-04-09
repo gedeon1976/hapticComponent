@@ -1,6 +1,6 @@
 /*!  \brief
 
-This class is the access door to the stereo camera interface
+This class is the access door to the haptic interface
 following the factory method pattern design for the API access
 
 the next lines shows an example of how to use this component
@@ -9,105 +9,55 @@ to get access to its functionalities
 \code{.cpp}
 
 
+		//This project test the haptic Component
+		//created for the purpose of connect a haptic device
+		//the device is a phantom 1.5 6 d.o.f High Force
+		
+		#include "HapticAccess.h"
+		
+		using namespace std;
+		
+		int main(int argc, char ** argv)
+		{
+		// create the component using the factory method pattern
+		HapticAccess AccessObject;
+		InterfaceHaptic *HapticComponent = AccessObject.CreateHaptic();
 
-//This project test the StereoCamera Component
-//created for the purpose of calibrate a StereoHead
-//that uses two logitech c270 webcams
+		// Initialize component
+		bool init = true;
+		HapticComponent->Init(init);
 
+		// create a camera state
+		
+			// define OutputArrays to save the results of the StereoCamera Component
+		
 
+		// call the methods from the Haptic Component
 
-// read the .xml configuration files for the cameras
-string myPath;
+		// check the camera state
 
-#include "StereoCameraAccess.h"
-#include <boost\filesystem.hpp>
+		
+		// call the calibration process
+		StereoComponent->calibrateStereoCamera(leftCameraSettingsFile, rightCameraSettingsFile);
 
-using namespace std;
-using namespace cv;
-using namespace boost::filesystem;
+		}
 
-int main(int argc, char ** argv)
-{
-// create the component using the factory method pattern
-StereoCameraAccess AccessObject;
-InterfaceStereoCamera *StereoComponent = AccessObject.CreateStereoCamera();
-
-// Initialize component
-StereoComponent->Init();
-
-// create a camera state
-InterfaceStereoCamera::StereoHeadState CameraState;
-string leftCameraSettingsFile;
-string rightCameraSettingsFile;
-
-// define OutputArrays to save the results of the StereoCamera Component
-vector <cv::Mat> IntrinsicParameters;
-vector <cv::Mat> DistortionParameters;
-vector <cv::Mat> StereoTransforms;
-vector <cv::Mat> ProjectionMatrices;
-double scaleFactor = 0;
-double VergenceAngle = 0;
-int CameraCalibrationStatus = 0;
-cameraParameters cameraUsefulParameters;
-
-double ErrorFundamentalMatrix = 0, ErrorEsentialMatrix = 0;
-cv::Mat FundamentalMatrix;
-cv::Mat EsentialMatrix;
-cv::Mat rotationFactor, traslationFactor;
-
-// call the methods from the StereoCamera Component
-
-// check the camera state
-
-CameraCalibrationStatus = StereoComponent->getStereoCameraState();
-
-if (CameraCalibrationStatus == InterfaceStereoCamera::STEREO_NOT_CALIBRATED)
-{
-string FileName("Left_Setup_c270.xml");
-
-boost::filesystem::path p{ "/" };
-StereoComponent->getPathForThisFile(FileName, myPath);
-
-boost::filesystem::path currentPath = boost::filesystem::current_path();
-
-boost::filesystem::directory_iterator it1{ currentPath };
-while (it1 != boost::filesystem::directory_iterator{})
-std::cout << *it1++ << '\n';
-
-boost::filesystem::path pathToSetupFiles = boost::filesystem::path(myPath);
-boost::filesystem::path parentPath = pathToSetupFiles.parent_path();
-
-leftCameraSettingsFile.assign(parentPath.generic_string() + p.generic_string() + "Left_Setup_c270.xml");
-rightCameraSettingsFile.assign(parentPath.generic_string() + p.generic_string() + "Right_Setup_c270.xml");
-
-// call the calibration process
-StereoComponent->calibrateStereoCamera(leftCameraSettingsFile, rightCameraSettingsFile);
-
-}
-
-CameraCalibrationStatus = StereoComponent->getStereoCameraState();
+		CameraCalibrationStatus = StereoComponent->getStereoCameraState();
 
 
-if (CameraCalibrationStatus == InterfaceStereoCamera::STEREO_CALIBRATED)
-{
-// get the results
-StereoComponent->getCameraUsefulParameters(cameraUsefulParameters);
-StereoComponent->getIntrinsicParameters(IntrinsicParameters);
-StereoComponent->getDistortionParameters(DistortionParameters);
-StereoComponent->getFundamentalMatrix(FundamentalMatrix);
-StereoComponent->getEsentialMatrix(EsentialMatrix);
-StereoComponent->getStereoTransforms(StereoTransforms);
-StereoComponent->getProjectionMatrices(ProjectionMatrices);
+		if (CameraCalibrationStatus == InterfaceStereoCamera::STEREO_CALIBRATED)
+		{
+		// get the results
+		
 
-// perform a tracking test to proof the results
-StereoComponent->getScaleFactor(scaleFactor, rotationFactor, traslationFactor);
-StereoComponent->testCalibrationProcess();
-}
+		// perform a tracking test to proof the results
+		
+		}
 
-delete StereoComponent;
+		delete HapticComponent;
 
-return 0;
-}
+		return 0;
+		}
 
 \endcode
 
