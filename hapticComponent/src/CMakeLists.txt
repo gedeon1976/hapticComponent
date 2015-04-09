@@ -9,6 +9,7 @@ set(HapticComponent_SRCS
 					HapticAccess.h
 					commonHapticComponent.h		
 					haptic.h 
+					HapticAccess.cpp
 					haptic.cpp)
 
 

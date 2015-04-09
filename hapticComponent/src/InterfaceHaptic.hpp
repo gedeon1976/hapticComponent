@@ -36,7 +36,7 @@ public:
 	virtual ~InterfaceHaptic(){};
 
 	/// Initializes the component
-	virtual void Init() = 0;
+	virtual void Init(bool &init) = 0;
 
 	/// calibrate the haptic device
 	virtual bool calibrate() = 0;
