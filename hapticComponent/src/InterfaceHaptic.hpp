@@ -55,6 +55,11 @@ public:
 	/// @param[in,out] hapticPosition save the haptic position in original coordinates or device coordinates
 	virtual void getHapticPosition(mt::Transform &hapticPosition) = 0;
 
+
+	/// set the gravity compensation ON or OFF
+	/// @param[in] gravityEnable boolean flag to indicate enabling or disabling the gravity compensation
+	virtual void setGravityCompensation(bool gravityEnable) = 0;
+
 	/// close the connection with the haptic device
 	virtual void closeConnection() = 0;
 

@@ -23,6 +23,9 @@
 
 #include "haptic.h"
 
+////////////////////////////////////////////////////////////////////////////
+// interface realization (implementation) for the API of this component
+////////////////////////////////////////////////////////////////////////////
 
 void Haptic::Init(bool &init){
 
@@ -51,6 +54,48 @@ void Haptic::Init(bool &init){
 	hdEnable(HD_FORCE_OUTPUT);
 
 }
+
+// start the connection with the haptic device
+void Haptic::startConnection(){
+
+}
+
+// set the workspace for this haptic device, usually a cube
+bool Haptic::setWorkSpaceLimits(mt::Vector3 minCubeLimits, mt::Vector3 maxCubeLimits){
+
+	if (m_init == false) return false;
+
+	m_phState->Xmin = minCubeLimits[0];	m_phState->Xmax = maxCubeLimits[0];
+	m_phState->Ymin = minCubeLimits[1];	m_phState->Ymax = maxCubeLimits[1];
+	m_phState->Zmin = minCubeLimits[2];	m_phState->Zmax = maxCubeLimits[2];
+
+	return true;
+}
+
+// get the current workspace area for this haptic device, if not set indicate this
+void Haptic::getWorkSpaceLimits(mt::Vector3 minCubeLimits, mt::Vector3 maxCubeLimits){
+
+}
+
+// get the Haptic position: pose and orientation
+void Haptic::getHapticPosition(mt::Transform &hapticposition){
+
+}
+
+// set the gravity compensation for this haptic device
+void Haptic::setGravityCompensation(bool &gravityEnable){
+
+}
+
+// close the connection with the device
+void Haptic::closeConnection(){
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////
+// internal methods implementation
+////////////////////////////////////////////////////////////////////////////
 
 
 bool Haptic::calibrate(){
@@ -216,7 +261,7 @@ bool Haptic::getVelocity(Vect6 &phVel)
 	return true;
 }
 
-bool Haptic::getButtom()
+bool Haptic::getButton()
 {
 	if (m_init == false) return false;
 
@@ -401,16 +446,7 @@ bool Haptic::getJacobianTranspose(ublas::matrix<mt::Scalar> &j)
 	return true;
 }
 
-bool Haptic::SetWorkSpaceLimits(mt::Vector3 minCubeLimits, mt::Vector3 maxCubeLimits){
 
-	if (m_init == false) return false;
-
-	m_phState->Xmin = minCubeLimits[0];	m_phState->Xmax = maxCubeLimits[0];
-	m_phState->Ymin = minCubeLimits[1];	m_phState->Ymax = maxCubeLimits[1];
-	m_phState->Zmin = minCubeLimits[2];	m_phState->Zmax = maxCubeLimits[2];
-
-	return true;
-}
 
 HDCallbackCode HDCALLBACK hdState(void *pState)
 {
