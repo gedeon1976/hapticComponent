@@ -37,7 +37,7 @@ public:
 	void Init(bool &init);
 	void startConnection();	
 	bool setWorkSpaceLimits(mt::Vector3 minCubeLimits, mt::Vector3 maxCubeLimits);
-	void getWorkSpaceLimits(mt::Vector3 MinCubicLimits, mt::Vector3 MaxCubicLimits);
+	void getWorkSpaceLimits(mt::Vector3 minCubicLimits, mt::Vector3 maxCubicLimits);
 	void getHapticPosition(mt::Transform &hapticPosition);
 	void setGravityCompensation(bool &gravityEnable);
 	void closeConnection();

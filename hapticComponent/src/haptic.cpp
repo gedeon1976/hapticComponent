@@ -105,12 +105,27 @@ void Haptic::Init(bool &init){
 	Premium_Omni.lc1 = 0.0;
 	Premium_Omni.lc2 = 0.0;
 	Premium_Omni.lc3 = 0.0;
-
-
+	
 }
 
 // start the connection with the haptic device
 void Haptic::startConnection(){
+
+	Vect6 ForceonHaptic(6);
+	
+	calibrate();
+	start();
+
+	// set initial values to the force to be send
+
+	ForceonHaptic[0] = 0;
+	ForceonHaptic[1] = 0;
+	ForceonHaptic[2] = 0;
+	ForceonHaptic[3] = 0;
+	ForceonHaptic[4] = 0;
+	ForceonHaptic[5] = 0;
+
+	setForce(ForceonHaptic);
 
 }
 
@@ -132,19 +147,59 @@ void Haptic::getWorkSpaceLimits(mt::Vector3 minCubeLimits, mt::Vector3 maxCubeLi
 }
 
 // get the Haptic position: pose and orientation
-void Haptic::getHapticPosition(mt::Transform &hapticposition){
+void Haptic::getHapticPosition(mt::Transform &hapticPosition){
+
+	getPosition(hapticPosition);
 
 }
 
 // set the gravity compensation for this haptic device
 void Haptic::setGravityCompensation(bool &gravityEnable){
 
+	Vect6 currentJointAngles,ForceOnHaptic(6);
+	jointAngles currentAngles;
+	CompensationForce currentGravityForce;
+
+	// get the current haptic joints positions
+	getJointPosition(currentJointAngles);
+
+	// check gravity check is ON or OFF
+	if (gravityEnable){
+
+		// get the corresponding vector values
+		setGravityVector(currentAngles, currentGravityForce);
+
+		ForceOnHaptic[0] = currentGravityForce.f1;
+		ForceOnHaptic[1] = currentGravityForce.f2;
+		ForceOnHaptic[2] = currentGravityForce.f3;
+		ForceOnHaptic[3] = currentGravityForce.f4;
+		ForceOnHaptic[4] = currentGravityForce.f5;
+		ForceOnHaptic[5] = currentGravityForce.f6;
+
+		// set the force to the haptic device
+		setForce(ForceOnHaptic);
+	}
+	else{
 	
+		ForceOnHaptic[0] = 0;
+		ForceOnHaptic[1] = 0;
+		ForceOnHaptic[2] = 0;
+		ForceOnHaptic[3] = 0;
+		ForceOnHaptic[4] = 0;
+		ForceOnHaptic[5] = 0;
+
+		// set the force to the haptic device
+		setForce(ForceOnHaptic);
+		
+	}
 
 }
 
 // close the connection with the device
 void Haptic::closeConnection(){
+
+	// stop the haptic device
+	stop();
 
 }
 
@@ -238,7 +293,7 @@ bool Haptic::stop(){
 
 void Haptic::setGravityVector(jointAngles &currentAngles, CompensationForce &currentForce){
 
-	HDlong gravityForceVector[6];
+	HDdouble gravityForceVector[6];
 
 	// select the haptic device automatically
 	switch (hapticDeviceID)
