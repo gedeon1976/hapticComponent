@@ -58,7 +58,7 @@ public:
 
 	/// set the gravity compensation ON or OFF
 	/// @param[in] gravityEnable boolean flag to indicate enabling or disabling the gravity compensation
-	virtual void setGravityCompensation(bool gravityEnable) = 0;
+	virtual void setGravityCompensation(bool &gravityEnable) = 0;
 
 	/// close the connection with the haptic device
 	virtual void closeConnection() = 0;

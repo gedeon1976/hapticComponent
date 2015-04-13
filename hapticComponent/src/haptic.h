@@ -49,10 +49,15 @@ private:
 	HapticState *m_phState;
 	bool m_init;
 
+	int hapticDeviceID;
 	bool hapticStatus;
 	mt::Transform HapticPosition;
 	mt::Vector3 position;
 	mt::Rotation orientation;
+	hapticPhysicalParameters Premium_1_5_6DOF, Premium_1_5_6DOF_HF, Premium_Omni;
+
+	/// get the haptic device type
+	void getHapticDevice(int &hapticType);
 
 	/// calibrate the haptic device
 	bool calibrate();
@@ -62,6 +67,9 @@ private:
 
 	/// stop the haptic device
 	bool stop();
+
+	/// set the gravity compensation
+	void setGravityVector(jointAngles &currentAngles, CompensationForce &currentForce);
 
 	/// old Function, not used	
 	bool getPositionTX(mt::Transform &);
