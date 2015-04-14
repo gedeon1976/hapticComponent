@@ -722,6 +722,7 @@ HDCallbackCode HDCALLBACK hdState(void *pState)
 	
 	HDdouble gravityForceVector[6];
 	jointAngles currentAngles;
+	double value1 = 0, value2 = 0, value3 = 0;
 	int hapticDeviceID;
 
 	// get the current joint positions
@@ -745,9 +746,9 @@ HDCallbackCode HDCALLBACK hdState(void *pState)
 		//   Premium 1.5 6 D.O.F
 	case P1_5_6DOF:
 
-		double value1 = Premium_1_5_6DOF.m2*Premium_1_5_6DOF.lc2 + Premium_1_5_6DOF.m3*Premium_1_5_6DOF.l2;
-		double value2 = Premium_1_5_6DOF.m3*Premium_1_5_6DOF.l3;
-		double value3 = Premium_1_5_6DOF.m3*Premium_1_5_6DOF.lc3;
+		value1 = Premium_1_5_6DOF.m2*Premium_1_5_6DOF.lc2 + Premium_1_5_6DOF.m3*Premium_1_5_6DOF.l2;
+		value2 = Premium_1_5_6DOF.m3*Premium_1_5_6DOF.l3;
+		value3 = Premium_1_5_6DOF.m3*Premium_1_5_6DOF.lc3;
 
 		gravityForceVector[0] = 0;
 		gravityForceVector[1] = (Premium_1_5_6DOF.m1*Premium_1_5_6DOF.lc1 + Premium_1_5_6DOF.m2*Premium_1_5_6DOF.l1
@@ -764,9 +765,9 @@ HDCallbackCode HDCALLBACK hdState(void *pState)
 		//   Premium 1.5 6 D.O.F
 	case P1_5_6DOF_HF:
 
-		double value1 = Premium_1_5_6DOF_HF.m2*Premium_1_5_6DOF_HF.lc2 + Premium_1_5_6DOF_HF.m3*Premium_1_5_6DOF_HF.l2;
-		double value2 = Premium_1_5_6DOF_HF.m3*Premium_1_5_6DOF_HF.l3;
-		double value3 = Premium_1_5_6DOF_HF.m3*Premium_1_5_6DOF_HF.lc3;
+		value1 = Premium_1_5_6DOF_HF.m2*Premium_1_5_6DOF_HF.lc2 + Premium_1_5_6DOF_HF.m3*Premium_1_5_6DOF_HF.l2;
+		value2 = Premium_1_5_6DOF_HF.m3*Premium_1_5_6DOF_HF.l3;
+		value3 = Premium_1_5_6DOF_HF.m3*Premium_1_5_6DOF_HF.lc3;
 
 		gravityForceVector[0] = 0;
 		gravityForceVector[1] = (Premium_1_5_6DOF_HF.m1*Premium_1_5_6DOF_HF.lc1 + Premium_1_5_6DOF_HF.m2*Premium_1_5_6DOF_HF.l1
@@ -783,8 +784,8 @@ HDCallbackCode HDCALLBACK hdState(void *pState)
 		// OMNI
 	case OMNI:
 
-		double value1 = Premium_Omni.m3*Premium_Omni.l2;
-		double value2 = Premium_Omni.m2*Premium_Omni.l1;
+		value1 = Premium_Omni.m3*Premium_Omni.l2;
+		value2 = Premium_Omni.m2*Premium_Omni.l1;
 
 		gravityForceVector[0] = 0;
 		gravityForceVector[1] = value1*sin(currentAngles.q2 + currentAngles.q3)

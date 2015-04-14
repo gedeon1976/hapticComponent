@@ -24,7 +24,7 @@ SPECIAL
 THANKS:		GOD
 
 */
-
+#pragma once
 #include "commonHapticComponent.h"
 
 class InterfaceHaptic{
