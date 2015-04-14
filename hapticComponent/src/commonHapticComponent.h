@@ -36,7 +36,7 @@ typedef ublas::vector<mt::Scalar> Vect6;
 ///< OMNI			omni 6 d.o.f, 3 are actuated, orientation not
 enum hapticDevice {P1_5_6DOF = 0, P1_5_6DOF_HF = 1, OMNI = 2};
 
-const double gravityConstant = 9.8;
+const double gravityK = 9.8;
 
 /// some haptic parameters used for the gravity compensation
 /// for details see the Thesis of Carlos Aldana pages 94,99
@@ -60,6 +60,8 @@ struct hapticPhysicalParameters{
 	double lc2;
 	double lc3;
 };
+
+hapticPhysicalParameters Premium_1_5_6DOF, Premium_1_5_6DOF_HF, Premium_Omni;
 
 /// structure that saves the current joint position in angles
 struct jointAngles{
@@ -97,6 +99,7 @@ struct HapticState{
 	HDdouble phBaseJoints[3];
 	HDdouble phGimbalJoints[3];
 	HDlong phMotorTorque[6];
+	hduVector3Dd phGravityForce;
 
 	// workspace limits 
 	HDfloat Xmin;

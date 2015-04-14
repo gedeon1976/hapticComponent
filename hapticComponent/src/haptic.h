@@ -54,7 +54,7 @@ private:
 	mt::Transform HapticPosition;
 	mt::Vector3 position;
 	mt::Rotation orientation;
-	hapticPhysicalParameters Premium_1_5_6DOF, Premium_1_5_6DOF_HF, Premium_Omni;
+	
 
 	/// get the haptic device type
 	void getHapticDevice(int &hapticType);

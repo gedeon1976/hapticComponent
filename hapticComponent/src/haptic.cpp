@@ -293,85 +293,7 @@ bool Haptic::stop(){
 
 void Haptic::setGravityVector(jointAngles &currentAngles, CompensationForce &currentForce){
 
-	HDdouble gravityForceVector[6];
-
-	// select the haptic device automatically
-	switch (hapticDeviceID)
-	{
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//   Premium 1.5 6 D.O.F
-	case P1_5_6DOF:
-
-		double value1 = Premium_1_5_6DOF.m2*Premium_1_5_6DOF.lc2 + Premium_1_5_6DOF.m3*Premium_1_5_6DOF.l2;
-		double value2 = Premium_1_5_6DOF.m3*Premium_1_5_6DOF.l3;
-		double value3 = Premium_1_5_6DOF.m3*Premium_1_5_6DOF.lc3;
-
-		gravityForceVector[0] = 0;
-		gravityForceVector[1] = (Premium_1_5_6DOF.m1*Premium_1_5_6DOF.lc1 + Premium_1_5_6DOF.m2*Premium_1_5_6DOF.l1
-								+ Premium_1_5_6DOF.m3*Premium_1_5_6DOF.l1)*cos(currentAngles.q2)
-								+ value1*sin(currentAngles.q3) + value2*cos(currentAngles.q3 + currentAngles.q5);
-		gravityForceVector[2] = value1*sin(currentAngles.q3) + value3*cos(currentAngles.q3 + currentAngles.q5);
-		gravityForceVector[3] = value3*sin(currentAngles.q3 + currentAngles.q5)*sin(currentAngles.q4);
-		gravityForceVector[4] = value3*cos(currentAngles.q3)*cos(currentAngles.q5);
-		gravityForceVector[5] = 0;
-
-		break;
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//   Premium 1.5 6 D.O.F
-	case P1_5_6DOF_HF:
-
-		double value1 = Premium_1_5_6DOF_HF.m2*Premium_1_5_6DOF_HF.lc2 + Premium_1_5_6DOF_HF.m3*Premium_1_5_6DOF_HF.l2;
-		double value2 = Premium_1_5_6DOF_HF.m3*Premium_1_5_6DOF_HF.l3;
-		double value3 = Premium_1_5_6DOF_HF.m3*Premium_1_5_6DOF_HF.lc3;
-
-		gravityForceVector[0] = 0;
-		gravityForceVector[1] = (Premium_1_5_6DOF_HF.m1*Premium_1_5_6DOF_HF.lc1 + Premium_1_5_6DOF_HF.m2*Premium_1_5_6DOF_HF.l1
-			+ Premium_1_5_6DOF_HF.m3*Premium_1_5_6DOF_HF.l1)*cos(currentAngles.q2)
-			+ value1*sin(currentAngles.q3) + value2*cos(currentAngles.q3 + currentAngles.q5);
-		gravityForceVector[2] = value1*sin(currentAngles.q3) + value3*cos(currentAngles.q3 + currentAngles.q5);
-		gravityForceVector[3] = value3*sin(currentAngles.q3 + currentAngles.q5)*sin(currentAngles.q4);
-		gravityForceVector[4] = value3*cos(currentAngles.q3)*cos(currentAngles.q5);
-		gravityForceVector[5] = 0;
-
-		break;
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// OMNI
-	case OMNI:
-
-		double value1 = Premium_Omni.m3*Premium_Omni.l2;
-		double value2 = Premium_Omni.m2*Premium_Omni.l1;
-
-		gravityForceVector[0] = 0;
-		gravityForceVector[1] = value1*sin(currentAngles.q2 + currentAngles.q3)
-								+ (value1 + value2)*cos(currentAngles.q2);
-		gravityForceVector[2] = value1*sin(currentAngles.q2 + currentAngles.q3);
-		gravityForceVector[3] = 0;
-		gravityForceVector[4] = 0;
-		gravityForceVector[5] = 0;
-
-		break;
 	
-	default:	// No haptic device or not well detected
-
-		gravityForceVector[0] = 0;
-		gravityForceVector[1] = 0;
-		gravityForceVector[2] = 0;
-		gravityForceVector[3] = 0;
-		gravityForceVector[4] = 0;
-		gravityForceVector[5] = 0;
-		break;
-	}
-
-	// set the compensation force for the device
-	currentForce.f1 = gravityForceVector[0];
-	currentForce.f2 = gravityForceVector[1];
-	currentForce.f3 = gravityForceVector[2];
-	currentForce.f4 = gravityForceVector[3];
-	currentForce.f5 = gravityForceVector[4];
-	currentForce.f6 = gravityForceVector[5];
 
 }
 
@@ -793,6 +715,109 @@ HDCallbackCode HDCALLBACK hdState(void *pState)
 	// It produces compelling planes with K = 1
 	F = Fx + Fy + Fz;
 	hdSetDoublev(HD_CURRENT_FORCE, F);
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Add the gravity compensation force vector
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	HDdouble gravityForceVector[6];
+	jointAngles currentAngles;
+	int hapticDeviceID;
+
+	// get the current joint positions
+	currentAngles.q1 = phState->phBaseJoints[0];
+	currentAngles.q2 = phState->phBaseJoints[1];
+	currentAngles.q3 = phState->phBaseJoints[2];
+
+	currentAngles.q4 = phState->phGimbalJoints[0];
+	currentAngles.q5 = phState->phGimbalJoints[1];
+	currentAngles.q6 = phState->phGimbalJoints[2];
+
+	// select the haptic device automatically
+	HDstring hapticType(hdGetString(HD_DEVICE_MODEL_TYPE));
+
+
+
+	switch (hapticDeviceID)
+	{
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//   Premium 1.5 6 D.O.F
+	case P1_5_6DOF:
+
+		double value1 = Premium_1_5_6DOF.m2*Premium_1_5_6DOF.lc2 + Premium_1_5_6DOF.m3*Premium_1_5_6DOF.l2;
+		double value2 = Premium_1_5_6DOF.m3*Premium_1_5_6DOF.l3;
+		double value3 = Premium_1_5_6DOF.m3*Premium_1_5_6DOF.lc3;
+
+		gravityForceVector[0] = 0;
+		gravityForceVector[1] = (Premium_1_5_6DOF.m1*Premium_1_5_6DOF.lc1 + Premium_1_5_6DOF.m2*Premium_1_5_6DOF.l1
+			+ Premium_1_5_6DOF.m3*Premium_1_5_6DOF.l1)*cos(currentAngles.q2)
+			+ value1*sin(currentAngles.q3) + value2*cos(currentAngles.q3 + currentAngles.q5);
+		gravityForceVector[2] = value1*sin(currentAngles.q3) + value3*cos(currentAngles.q3 + currentAngles.q5);
+		gravityForceVector[3] = value3*sin(currentAngles.q3 + currentAngles.q5)*sin(currentAngles.q4);
+		gravityForceVector[4] = value3*cos(currentAngles.q3)*cos(currentAngles.q5);
+		gravityForceVector[5] = 0;
+
+		break;
+
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//   Premium 1.5 6 D.O.F
+	case P1_5_6DOF_HF:
+
+		double value1 = Premium_1_5_6DOF_HF.m2*Premium_1_5_6DOF_HF.lc2 + Premium_1_5_6DOF_HF.m3*Premium_1_5_6DOF_HF.l2;
+		double value2 = Premium_1_5_6DOF_HF.m3*Premium_1_5_6DOF_HF.l3;
+		double value3 = Premium_1_5_6DOF_HF.m3*Premium_1_5_6DOF_HF.lc3;
+
+		gravityForceVector[0] = 0;
+		gravityForceVector[1] = (Premium_1_5_6DOF_HF.m1*Premium_1_5_6DOF_HF.lc1 + Premium_1_5_6DOF_HF.m2*Premium_1_5_6DOF_HF.l1
+			+ Premium_1_5_6DOF_HF.m3*Premium_1_5_6DOF_HF.l1)*cos(currentAngles.q2)
+			+ value1*sin(currentAngles.q3) + value2*cos(currentAngles.q3 + currentAngles.q5);
+		gravityForceVector[2] = value1*sin(currentAngles.q3) + value3*cos(currentAngles.q3 + currentAngles.q5);
+		gravityForceVector[3] = value3*sin(currentAngles.q3 + currentAngles.q5)*sin(currentAngles.q4);
+		gravityForceVector[4] = value3*cos(currentAngles.q3)*cos(currentAngles.q5);
+		gravityForceVector[5] = 0;
+
+		break;
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// OMNI
+	case OMNI:
+
+		double value1 = Premium_Omni.m3*Premium_Omni.l2;
+		double value2 = Premium_Omni.m2*Premium_Omni.l1;
+
+		gravityForceVector[0] = 0;
+		gravityForceVector[1] = value1*sin(currentAngles.q2 + currentAngles.q3)
+			+ (value1 + value2)*cos(currentAngles.q2);
+		gravityForceVector[2] = value1*sin(currentAngles.q2 + currentAngles.q3);
+		gravityForceVector[3] = 0;
+		gravityForceVector[4] = 0;
+		gravityForceVector[5] = 0;
+
+		break;
+
+	default:	// No haptic device or not well detected
+
+		gravityForceVector[0] = 0;
+		gravityForceVector[1] = 0;
+		gravityForceVector[2] = 0;
+		gravityForceVector[3] = 0;
+		gravityForceVector[4] = 0;
+		gravityForceVector[5] = 0;
+		break;
+	}
+
+	// set the compensation force and torque for the device
+	phState->phGravityForce[0] = gravityK*gravityForceVector[0];
+	phState->phGravityForce[1] = gravityK*gravityForceVector[1];
+	phState->phGravityForce[2] = gravityK*gravityForceVector[2];
+
+	phState->phTorqe[0] = gravityK*gravityForceVector[3];
+	phState->phTorqe[1] = gravityK*gravityForceVector[4];
+	phState->phTorqe[2] = gravityK*gravityForceVector[5];
+
+	hdSetDoublev(HD_CURRENT_FORCE, phState->phGravityForce);
+	hdSetDoublev(HD_CURRENT_TORQUE, phState->phTorqe);
 
 	hdEndFrame(hdGetCurrentDevice());
 

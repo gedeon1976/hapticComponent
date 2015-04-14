@@ -23,37 +23,27 @@ to get access to its functionalities
 		HapticAccess AccessObject;
 		InterfaceHaptic *HapticComponent = AccessObject.CreateHaptic();
 
+		bool enableGravity = true;
+		mt::Transform hapticPosition;
+		mt::Vector3 position;
+
 		// Initialize component
 		bool init = true;
 		HapticComponent->Init(init);
 
-		// create a camera state
-		
-			// define OutputArrays to save the results of the StereoCamera Component
-		
-
 		// call the methods from the Haptic Component
+		HapticComponent->startConnection();
+		HapticComponent->setGravityCompensation(enableGravity)
 
-		// check the camera state
+		while(1){
 
-		
-		// call the calibration process
-		StereoComponent->calibrateStereoCamera(leftCameraSettingsFile, rightCameraSettingsFile);
+			// get the haptic position
+			HapticComponent->getHapticPosition(hapticPosition);
+			position = hapticPosition.getTraslation();
+			cout << "X: " << position[0] << "Y: " << position[1] << "Z: " << position[2] << "\n" << endl;			
 
 		}
-
-		CameraCalibrationStatus = StereoComponent->getStereoCameraState();
-
-
-		if (CameraCalibrationStatus == InterfaceStereoCamera::STEREO_CALIBRATED)
-		{
-		// get the results
 		
-
-		// perform a tracking test to proof the results
-		
-		}
-
 		delete HapticComponent;
 
 		return 0;
