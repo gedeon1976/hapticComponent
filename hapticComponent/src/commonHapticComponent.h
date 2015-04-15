@@ -18,6 +18,7 @@ HapticComponent
 
 //HD headers from the Open Haptics
 #include <HD/hd.h>
+#include <HL/hl.h>
 #include <HDU/hduVector.h>
 //#include <HDU/hduError.h>
 
@@ -99,6 +100,7 @@ struct HapticState{
 	HDdouble phBaseJoints[3];
 	HDdouble phGimbalJoints[3];
 	HDlong phMotorTorque[6];
+	HDboolean enableGravity;
 	hduVector3Dd phGravityForce;
 
 	// workspace limits 
