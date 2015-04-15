@@ -1,98 +1,39 @@
-
-/*
-	This project test the StereoCamera Component
-	created for the purpose of calibrate a StereoHead
-	that uses two logitech c270 webcams
-
-*/
-#include "StereoCameraAccess.h"
-#include <boost\filesystem.hpp>
-
-using namespace std;
-using namespace cv;
-using namespace boost::filesystem;
-
-int main(int argc, char ** argv)
-{
+//This project test the haptic Component
+//created with the purpose of connect a haptic device
+//the device is a phantom 1.5 6 d.o.f High Force
+		
+	#include "HapticAccess.h"
+	
+	using namespace std;
+	
+	int main(int argc, char ** argv)
+	{
 	// create the component using the factory method pattern
-	StereoCameraAccess AccessObject;
-	InterfaceStereoCamera *StereoComponent = AccessObject.CreateStereoCamera();
+	HapticAccess AccessObject;
+	InterfaceHaptic *HapticComponent = AccessObject.CreateHaptic();
+
+	bool enableGravity = true;
+	mt::Transform hapticPosition;
+	mt::Vector3 position;
 
 	// Initialize component
-	StereoComponent->Init();
+	bool init = true;
+	HapticComponent->Init(init);
 
-	// create a camera state
-	InterfaceStereoCamera::StereoHeadState CameraState;
-	string leftCameraSettingsFile;
-	string rightCameraSettingsFile;
+	// call the methods from the Haptic Component
+	HapticComponent->startConnection();
+	HapticComponent->setGravityCompensation(enableGravity)
 
-	// define OutputArrays to save the results of the StereoCamera Component
-	vector <cv::Mat> IntrinsicParameters;
-	vector <cv::Mat> DistortionParameters;
-	vector <cv::Mat> StereoTransforms;
-	vector <cv::Mat> ProjectionMatrices;
-	double scaleFactor = 0;
-	double VergenceAngle = 0;
-	int CameraCalibrationStatus = 0;
-	cameraParameters cameraUsefulParameters;
+	while(1){
 
-	double ErrorFundamentalMatrix = 0, ErrorEsentialMatrix = 0;
-	cv::Mat FundamentalMatrix;
-	cv::Mat EsentialMatrix;
-	cv::Mat rotationFactor, traslationFactor;
+		// get the haptic position
+		HapticComponent->getHapticPosition(hapticPosition);
+		position = hapticPosition.getTraslation();
+		cout << "X: " << position[0] << "Y: " << position[1] << "Z: " << position[2] << "\n" << endl;			
 
-	// call the methods from the StereoCamera Component
-
-	// check the camera state
-	
-	CameraCalibrationStatus = StereoComponent->getStereoCameraState();
-
-	if (CameraCalibrationStatus == InterfaceStereoCamera::STEREO_NOT_CALIBRATED )
-	{
-		// read the .xml configuration files for the cameras
-		string myPath;
-		string FileName("Left_Setup_c270.xml");
-
-		boost::filesystem::path p{ "/" };
-		StereoComponent->getPathForThisFile(FileName, myPath);
-
-		boost::filesystem::path currentPath = boost::filesystem::current_path();
-		
-		boost::filesystem::directory_iterator it1{ currentPath };
-		while (it1 != boost::filesystem::directory_iterator{})
-			std::cout << *it1++ << '\n';
-		
-		boost::filesystem::path pathToSetupFiles = boost::filesystem::path(myPath);
-		boost::filesystem::path parentPath= pathToSetupFiles.parent_path();
-
-		leftCameraSettingsFile.assign(parentPath.generic_string() + p.generic_string() + "Left_Setup_c270.xml");
-		rightCameraSettingsFile.assign(parentPath.generic_string() + p.generic_string() + "Right_Setup_c270.xml");
-
-		// call the calibration process
-		StereoComponent->calibrateStereoCamera(leftCameraSettingsFile,rightCameraSettingsFile);
-		
-	}
-
-	CameraCalibrationStatus = StereoComponent->getStereoCameraState();
-
-
-	if (CameraCalibrationStatus == InterfaceStereoCamera::STEREO_CALIBRATED)
-	{
-		// get the results
-		StereoComponent->getCameraUsefulParameters(cameraUsefulParameters);
-		StereoComponent->getIntrinsicParameters(IntrinsicParameters);
-		StereoComponent->getDistortionParameters(DistortionParameters);
-		StereoComponent->getFundamentalMatrix(FundamentalMatrix);
-		StereoComponent->getEsentialMatrix(EsentialMatrix);		
-		StereoComponent->getStereoTransforms(StereoTransforms);	
-		StereoComponent->getProjectionMatrices(ProjectionMatrices);
-		
-		// perform a tracking test to proof the results
-		StereoComponent->getScaleFactor(scaleFactor, rotationFactor, traslationFactor);
-		StereoComponent->testCalibrationProcess();
 	}
 	
-	delete StereoComponent;
+	delete HapticComponent;
 
 	return 0;
-}
+	}

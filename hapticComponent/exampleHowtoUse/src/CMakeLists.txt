@@ -12,15 +12,15 @@ else (UNIX)
 endif (UNIX)
 
 # set source code
-set(testStereoCameraComponent_SRCS 
-					testStereoCameraComponent.cpp)
+set(testHapticComponent_SRCS 
+					testHapticComponent.cpp)
 
 # generate executable file
-add_executable(testStereoCameraComponent ${testStereoCameraComponent_SRCS})
+add_executable(testHapticComponent ${testHapticComponent_SRCS})
 
 if (UNIX) 
-  target_link_libraries(testStereoCameraComponent ${OpenCV_LIBS} ${Boost_LIBRARIES} ${3DPOINTER_LIBRARY})
+  target_link_libraries(testHapticComponent ${OpenCV_LIBS} ${Boost_LIBRARIES} ${3DPOINTER_LIBRARY})
 endif (UNIX)
 if (WIN32)
-  target_link_libraries(testStereoCameraComponent ${OpenCV_LIBS} ${Boost_LIBRARIES} ${3DPOINTER_LIBRARY})
+  target_link_libraries(testHapticComponent ${OpenCV_LIBS} ${Boost_LIBRARIES} ${3DPOINTER_LIBRARY})
 endif (WIN32)

@@ -723,7 +723,7 @@ HDCallbackCode HDCALLBACK hdState(void *pState)
 	HDdouble gravityForceVector[6];
 	jointAngles currentAngles;
 	double value1 = 0, value2 = 0, value3 = 0;
-	int hapticDeviceID;
+	int hapticDeviceID = 0;
 
 	// get the current joint positions
 	currentAngles.q1 = phState->phBaseJoints[0];

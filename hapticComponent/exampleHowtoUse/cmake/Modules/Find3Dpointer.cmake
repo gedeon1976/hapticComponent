@@ -1,16 +1,16 @@
 # try to find the 3Dpointer libraries
 #
 #	author:		Henry Portilla
-#	date:		oct.24.2014
+#	date:		April.15.2015
 
 # Once done this will define
 # 3DPOINTER_FOUND			- the 3dpointer libraries has been found
 # 3DPOINTER_INCLUDE_DIR 	- the 3dpointer include directories
 # 3DPOINTER_LIBRARIES 		- the libraries needed to use the 3Dpointer
 
-find_path(3DPOINTER_INCLUDE_DIR StereoCameraAccess.h)
+find_path(3DPOINTER_INCLUDE_DIR HapticAccess.h)
 
-find_library(3DPOINTER_LIBRARY NAMES StereoCameraComponent)
+find_library(3DPOINTER_LIBRARY NAMES HapticComponent)
 
 set(3DPOINTER_LIBRARIES ${3DPOINTER_LIBRARY})
 set(3DPOINTER_INCLUDE_DIRS ${3DPOINTER_INCLUDE_DIR})
