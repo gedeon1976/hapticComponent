@@ -55,6 +55,9 @@ public:
 	/// @param[in,out] hapticPosition save the haptic position in original coordinates or device coordinates
 	virtual void getHapticPosition(mt::Transform &hapticPosition) = 0;
 
+	/// get the compensation force from the haptic device
+	/// @param[in,out] forceVector it contains the force vector in position and torque for the haptic device
+	virtual void getGravityCompensation(CompensationForce &forceVector) = 0;
 
 	/// set the gravity compensation ON or OFF
 	/// @param[in] gravityEnable boolean flag to indicate enabling or disabling the gravity compensation

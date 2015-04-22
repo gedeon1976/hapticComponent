@@ -18,7 +18,6 @@ HapticComponent
 
 //HD headers from the Open Haptics
 #include <HD/hd.h>
-#include <HL/hl.h>
 #include <HDU/hduVector.h>
 //#include <HDU/hduError.h>
 
@@ -62,7 +61,6 @@ struct hapticPhysicalParameters{
 	double lc3;
 };
 
-hapticPhysicalParameters Premium_1_5_6DOF, Premium_1_5_6DOF_HF, Premium_Omni;
 
 /// structure that saves the current joint position in angles
 struct jointAngles{
@@ -100,8 +98,8 @@ struct HapticState{
 	HDdouble phBaseJoints[3];
 	HDdouble phGimbalJoints[3];
 	HDlong phMotorTorque[6];
-	HDboolean enableGravity;
 	hduVector3Dd phGravityForce;
+	HDboolean gravityEnable;
 
 	// workspace limits 
 	HDfloat Xmin;
@@ -110,5 +108,7 @@ struct HapticState{
 	HDfloat Ymax;
 	HDfloat Zmin;
 	HDfloat Zmax;
+
+	hapticPhysicalParameters Premium_1_5_6DOF, Premium_1_5_6DOF_HF, Premium_Omni;
 
 };

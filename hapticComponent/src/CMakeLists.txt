@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR} ${OpenCV_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${mt_INCLUDE_DIRS}) 
-link_directories(${OpenCV_LIB_DIR} ${Boost_LIBRARY_DIRS})
+include_directories(${CMAKE_CURRENT_BINARY_DIR} ${OpenCV_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${mt_INCLUDE_DIRS} ${OPENHAPTICS_INCLUDE_DIR} ${OPENHAPTICS_INCLUDE_UTILITIES_DIR}) 
+link_directories(${OpenCV_LIB_DIR} ${Boost_LIBRARY_DIRS} ${OPENHAPTICS_LIBRARIES})
   
 
 set(HapticComponent_SRCS 

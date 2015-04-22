@@ -32,13 +32,14 @@ class Haptic : public InterfaceHaptic {
 public:
 	/// create the interface implementing the virtual constructor
 	InterfaceHaptic *Create() { return new Haptic(); };
-	~Haptic();
+	~Haptic(){};
 
 	void Init(bool &init);
 	void startConnection();	
 	bool setWorkSpaceLimits(mt::Vector3 minCubeLimits, mt::Vector3 maxCubeLimits);
 	void getWorkSpaceLimits(mt::Vector3 minCubicLimits, mt::Vector3 maxCubicLimits);
 	void getHapticPosition(mt::Transform &hapticPosition);
+	void getGravityCompensation(CompensationForce &forceVector);
 	void setGravityCompensation(bool &gravityEnable);
 	void closeConnection();
 
@@ -92,6 +93,10 @@ private:
 	/// get the position of the joints
 	/// @param[in,out] Vect6 it contains the position of each joint of the haptic
 	bool getJointPosition(Vect6 &);
+
+	/// get the position of the joints overloaded method
+	/// @param[in,out] currentAngles it contains the position of each joint of the haptic
+	bool getJointPosition(jointAngles &currentAngles);
 
 	/// set the torque to each torque
 	/// @param[in,out] Vect6 it contains the torque to be set at each joint motor

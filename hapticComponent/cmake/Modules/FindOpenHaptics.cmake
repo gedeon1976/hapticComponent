@@ -7,6 +7,8 @@
 
 
 # Look for the header file.
+MESSAGE("Finding OpenHaptics...")
+
 FIND_PATH(OPENHAPTICS_INCLUDE_DIR NAMES HL/hl.h HD/hd.h
                                   PATHS $ENV{OH_SDK_BASE}/include
                                         "../OpenHaptics/Academic/3.1/include")
@@ -21,19 +23,19 @@ MARK_AS_ADVANCED(OPENHAPTICS_INCLUDE_UTILITIES_DIR)
 # Look for the library.
 FIND_LIBRARY(HL_LIBRARY NAMES HL 
                         PATHS $ENV{OH_SDK_BASE}/lib
-							  $ENV{OH_SDK_BASE}/lib/Win32
+							  $ENV{OH_SDK_BASE}/lib/x64/DebugAcademicEdition
                               "../OpenHaptics/Academic/3.1/lib")
 MARK_AS_ADVANCED(HL_LIBRARY)
 
 FIND_LIBRARY(HD_LIBRARY NAMES HD
                         PATHS $ENV{OH_SDK_BASE}/lib
-							  $ENV{OH_SDK_BASE}/lib/Win32
+							  $ENV{OH_SDK_BASE}/lib/x64/DebugAcademicEdition
                               "../OpenHaptics/Academic/3.1/lib")
 MARK_AS_ADVANCED(HD_LIBRARY)
 
 FIND_LIBRARY(HDU_LIBRARY NAMES HDU
                          PATHS $ENV{OH_SDK_BASE}/utilities/lib
-						       $ENV{OH_SDK_BASE}/utilities/lib/Win32/Release
+						       $ENV{OH_SDK_BASE}/utilities/lib/x64/Debug
                                "../OpenHaptics/Academic/3.1/utilities/lib")
 MARK_AS_ADVANCED(HDU_LIBRARY)
 
