@@ -21,6 +21,10 @@ message("output directory is: " ${LIBRARY_OUTPUT_PATH})
 find_package(OpenCV REQUIRED)
 find_package(3Dpointer REQUIRED)
 
+if (WIN32)
+  find_package(OpenHaptics REQUIRED)
+endif (WIN32)
+
 #find the boost libraries
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_MULTITHREADED ON)

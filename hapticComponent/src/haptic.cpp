@@ -27,6 +27,8 @@
 // interface realization (implementation) for the API of this component
 ////////////////////////////////////////////////////////////////////////////
 
+
+
 void Haptic::Init(bool &init){
 
 	m_phState = new HapticState;
@@ -58,53 +60,53 @@ void Haptic::Init(bool &init){
 	////////////////////////////////////////////
 	// Premium 1.5 6 DOF 
 	// masses
-	Premium_1_5_6DOF.m1 = 0.026;
-	Premium_1_5_6DOF.m2 = 0.01;
-	Premium_1_5_6DOF.m3 = 0.09;
+	m_phState->Premium_1_5_6DOF.m1 = 0.026;
+	m_phState->Premium_1_5_6DOF.m2 = 0.01;
+	m_phState->Premium_1_5_6DOF.m3 = 0.09;
 
 	// lengths
-	Premium_1_5_6DOF.l1 = 0.21;
-	Premium_1_5_6DOF.l2 = 0.21;
-	Premium_1_5_6DOF.l3 = 0.07;
+	m_phState->Premium_1_5_6DOF.l1 = 0.21;
+	m_phState->Premium_1_5_6DOF.l2 = 0.21;
+	m_phState->Premium_1_5_6DOF.l3 = 0.07;
 
 	// center of masses
-	Premium_1_5_6DOF.lc1 = 0.105;
-	Premium_1_5_6DOF.lc2 = 0.21;
-	Premium_1_5_6DOF.lc3 = 0.07;
+	m_phState->Premium_1_5_6DOF.lc1 = 0.105;
+	m_phState->Premium_1_5_6DOF.lc2 = 0.21;
+	m_phState->Premium_1_5_6DOF.lc3 = 0.07;
 
 	////////////////////////////////////////////
 	// Premium 1.5 6 DOF High Force
 	// masses
-	Premium_1_5_6DOF_HF.m1 = 0.0056;
-	Premium_1_5_6DOF_HF.m2 = 0.005;
-	Premium_1_5_6DOF_HF.m3 = 0.09;
+	m_phState->Premium_1_5_6DOF_HF.m1 = 0.0056;
+	m_phState->Premium_1_5_6DOF_HF.m2 = 0.005;
+	m_phState->Premium_1_5_6DOF_HF.m3 = 0.09;
 
 	// lengths
-	Premium_1_5_6DOF_HF.l1 = 0.21;
-	Premium_1_5_6DOF_HF.l2 = 0.21;
-	Premium_1_5_6DOF_HF.l3 = 0.1;
+	m_phState->Premium_1_5_6DOF_HF.l1 = 0.21;
+	m_phState->Premium_1_5_6DOF_HF.l2 = 0.21;
+	m_phState->Premium_1_5_6DOF_HF.l3 = 0.1;
 
 	// center of masses
-	Premium_1_5_6DOF_HF.lc1 = 0.105;
-	Premium_1_5_6DOF_HF.lc2 = 0.21;
-	Premium_1_5_6DOF_HF.lc3 = 0.1;
+	m_phState->Premium_1_5_6DOF_HF.lc1 = 0.105;
+	m_phState->Premium_1_5_6DOF_HF.lc2 = 0.21;
+	m_phState->Premium_1_5_6DOF_HF.lc3 = 0.1;
 
 	////////////////////////////////////////////
 	// Omni 6 DOF 
 	// masses
-	Premium_Omni.m1 = 0.0;
-	Premium_Omni.m2 = 0.02;
-	Premium_Omni.m3 = 0.055;
+	m_phState->Premium_Omni.m1 = 0.0;
+	m_phState->Premium_Omni.m2 = 0.02;
+	m_phState->Premium_Omni.m3 = 0.055;
 
 	// lengths
-	Premium_Omni.l1 = 0.16;
-	Premium_Omni.l2 = 0.19;
-	Premium_Omni.l3 = 0.0;
+	m_phState->Premium_Omni.l1 = 0.16;
+	m_phState->Premium_Omni.l2 = 0.19;
+	m_phState->Premium_Omni.l3 = 0.0;
 
 	// center of masses
-	Premium_Omni.lc1 = 0.0;
-	Premium_Omni.lc2 = 0.0;
-	Premium_Omni.lc3 = 0.0;
+	m_phState->Premium_Omni.lc1 = 0.0;
+	m_phState->Premium_Omni.lc2 = 0.0;
+	m_phState->Premium_Omni.lc3 = 0.0;
 	
 }
 
@@ -153,23 +155,33 @@ void Haptic::getHapticPosition(mt::Transform &hapticPosition){
 
 }
 
+// get the current force applied to the gravity compensation
+void Haptic::getGravityCompensation(CompensationForce &forceVector){
+
+	forceVector.f1 = m_phState->phGravityForce[0];
+	forceVector.f2 = m_phState->phGravityForce[1];
+	forceVector.f3 = m_phState->phGravityForce[2];
+
+	forceVector.f4 = m_phState->phTorqe[0];
+	forceVector.f5 = m_phState->phTorqe[1];
+	forceVector.f6 = m_phState->phTorqe[2];
+
+}
+
 // set the gravity compensation for this haptic device
 void Haptic::setGravityCompensation(bool &gravityEnable){
 
-	
 	// check gravity check is ON or OFF
 	if (gravityEnable){
 
-		// set the force to the haptic device and enable the gravity
-		m_phState->enableGravity = 1;
+		m_phState->gravityEnable = 1;
+			
 	}
 	else{
 	
-		// set the force to the haptic device and disable gravity
-		m_phState->enableGravity = 0;
+		m_phState->gravityEnable = 0;
+		
 	}
-
-	
 
 }
 
@@ -327,8 +339,6 @@ bool Haptic::getPosition(mt::Transform &trans)
 	return true;
 }
 
-
-
 bool Haptic::getJointPosition(Vect6 &phJoints)
 {
 	if (m_init == false) return false;
@@ -340,6 +350,21 @@ bool Haptic::getJointPosition(Vect6 &phJoints)
 	phJoints[3] = m_phState->phGimbalJoints[0];
 	phJoints[4] = m_phState->phGimbalJoints[1];
 	phJoints[5] = m_phState->phGimbalJoints[2];
+
+	return true;
+}
+
+bool Haptic::getJointPosition(jointAngles &currentAngles)
+{
+	if (m_init == false) return false;
+
+	currentAngles.q1 = m_phState->phBaseJoints[0];
+	currentAngles.q2 = m_phState->phBaseJoints[1];
+	currentAngles.q3 = m_phState->phBaseJoints[2];
+
+	currentAngles.q4 = m_phState->phGimbalJoints[0];
+	currentAngles.q5 = m_phState->phGimbalJoints[1];
+	currentAngles.q6 = m_phState->phGimbalJoints[2];
 
 	return true;
 }
@@ -698,88 +723,90 @@ HDCallbackCode HDCALLBACK hdState(void *pState)
 	// Add the gravity compensation force vector
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	// check if it is enabled
-	if (phState->enableGravity == HL_TRUE){
+	HDdouble gravityForceVector[6];
+	jointAngles currentAngles;
+	double value1 = 0, value2 = 0, value3 = 0;
+	int hapticDeviceID= 1000;
 
-		HDdouble gravityForceVector[6];
-		jointAngles currentAngles;
-		double value1 = 0, value2 = 0, value3 = 0;
-		int hapticDeviceID = 0;
+	// get the current joint positions
+	currentAngles.q1 = phState->phBaseJoints[0];
+	currentAngles.q2 = phState->phBaseJoints[1];
+	currentAngles.q3 = phState->phBaseJoints[2];
 
-		// get the current joint positions
-		currentAngles.q1 = phState->phBaseJoints[0];
-		currentAngles.q2 = phState->phBaseJoints[1];
-		currentAngles.q3 = phState->phBaseJoints[2];
+	currentAngles.q4 = phState->phGimbalJoints[0];
+	currentAngles.q5 = phState->phGimbalJoints[1];
+	currentAngles.q6 = phState->phGimbalJoints[2];
 
-		currentAngles.q4 = phState->phGimbalJoints[0];
-		currentAngles.q5 = phState->phGimbalJoints[1];
-		currentAngles.q6 = phState->phGimbalJoints[2];
+	// select the haptic device automatically
+	std::string hapticType(hdGetString(HD_DEVICE_MODEL_TYPE));
 
-		// select the haptic device automatically
-		HDstring hapticType(hdGetString(HD_DEVICE_MODEL_TYPE));
+	if (hapticType.compare("PHANTOM Premium 1.5") == 0){
 
-		if (hapticType == "Premium_1.5"){
+		hapticDeviceID = 0;
+	}
 
-			hapticDeviceID = P1_5_6DOF;
-		}
+	if (hapticType.compare("PHANTOM Premium 1.5 6DOF") == 0){
 
-		if (hapticType == "Premium_1.5_"){
+		hapticDeviceID = 1;
+	}
 
-			hapticDeviceID = P1_5_6DOF_HF;
-		}
+	if (hapticType.compare("Omni") == 0){
 
-		if (hapticType == "Premium_Omni"){
+		hapticDeviceID = 2;
+	}
 
-			hapticDeviceID = OMNI;
-		}
-
+	///////////////////////////////////////////////////////////////////////////
+	// GRAVITY COMPENSATION
+	// check if gravity compensation is enabled or not
+	if (phState->gravityEnable){
+	
 		switch (hapticDeviceID)
 		{
 
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			//   Premium 1.5 6 D.O.F
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//   Premium 1.5 6 D.O.F
 		case P1_5_6DOF:
 
-			value1 = Premium_1_5_6DOF.m2*Premium_1_5_6DOF.lc2 + Premium_1_5_6DOF.m3*Premium_1_5_6DOF.l2;
-			value2 = Premium_1_5_6DOF.m3*Premium_1_5_6DOF.l3;
-			value3 = Premium_1_5_6DOF.m3*Premium_1_5_6DOF.lc3;
+			value1 = phState->Premium_1_5_6DOF.m2*phState->Premium_1_5_6DOF.lc2 + phState->Premium_1_5_6DOF.m3*phState->Premium_1_5_6DOF.l2;
+			value2 = phState->Premium_1_5_6DOF.m3*phState->Premium_1_5_6DOF.l3;
+			value3 = phState->Premium_1_5_6DOF.m3*phState->Premium_1_5_6DOF.lc3;
 
 			gravityForceVector[0] = 0;
-			gravityForceVector[1] = (Premium_1_5_6DOF.m1*Premium_1_5_6DOF.lc1 + Premium_1_5_6DOF.m2*Premium_1_5_6DOF.l1
-				+ Premium_1_5_6DOF.m3*Premium_1_5_6DOF.l1)*cos(currentAngles.q2)
+			gravityForceVector[1] = (phState->Premium_1_5_6DOF.m1*phState->Premium_1_5_6DOF.lc1 + phState->Premium_1_5_6DOF.m2*phState->Premium_1_5_6DOF.l1
+				+ phState->Premium_1_5_6DOF.m3*phState->Premium_1_5_6DOF.l1)*cos(currentAngles.q2)
 				+ value1*sin(currentAngles.q3) + value2*cos(currentAngles.q3 + currentAngles.q5);
 			gravityForceVector[2] = value1*sin(currentAngles.q3) + value3*cos(currentAngles.q3 + currentAngles.q5);
 			gravityForceVector[3] = value3*sin(currentAngles.q3 + currentAngles.q5)*sin(currentAngles.q4);
 			gravityForceVector[4] = value3*cos(currentAngles.q3)*cos(currentAngles.q5);
 			gravityForceVector[5] = 0;
 
-			break;
+		break;
 
-			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			//   Premium 1.5 6 D.O.F
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//   Premium 1.5 6 D.O.F
 		case P1_5_6DOF_HF:
 
-			value1 = Premium_1_5_6DOF_HF.m2*Premium_1_5_6DOF_HF.lc2 + Premium_1_5_6DOF_HF.m3*Premium_1_5_6DOF_HF.l2;
-			value2 = Premium_1_5_6DOF_HF.m3*Premium_1_5_6DOF_HF.l3;
-			value3 = Premium_1_5_6DOF_HF.m3*Premium_1_5_6DOF_HF.lc3;
+			value1 = phState->Premium_1_5_6DOF_HF.m2*phState->Premium_1_5_6DOF_HF.lc2 + phState->Premium_1_5_6DOF_HF.m3*phState->Premium_1_5_6DOF_HF.l2;
+			value2 = phState->Premium_1_5_6DOF_HF.m3*phState->Premium_1_5_6DOF_HF.l3;
+			value3 = phState->Premium_1_5_6DOF_HF.m3*phState->Premium_1_5_6DOF_HF.lc3;
 
 			gravityForceVector[0] = 0;
-			gravityForceVector[1] = (Premium_1_5_6DOF_HF.m1*Premium_1_5_6DOF_HF.lc1 + Premium_1_5_6DOF_HF.m2*Premium_1_5_6DOF_HF.l1
-				+ Premium_1_5_6DOF_HF.m3*Premium_1_5_6DOF_HF.l1)*cos(currentAngles.q2)
+			gravityForceVector[1] = (phState->Premium_1_5_6DOF_HF.m1*phState->Premium_1_5_6DOF_HF.lc1 + phState->Premium_1_5_6DOF_HF.m2*phState->Premium_1_5_6DOF_HF.l1
+				+ phState->Premium_1_5_6DOF_HF.m3*phState->Premium_1_5_6DOF_HF.l1)*cos(currentAngles.q2)
 				+ value1*sin(currentAngles.q3) + value2*cos(currentAngles.q3 + currentAngles.q5);
 			gravityForceVector[2] = value1*sin(currentAngles.q3) + value3*cos(currentAngles.q3 + currentAngles.q5);
 			gravityForceVector[3] = value3*sin(currentAngles.q3 + currentAngles.q5)*sin(currentAngles.q4);
 			gravityForceVector[4] = value3*cos(currentAngles.q3)*cos(currentAngles.q5);
 			gravityForceVector[5] = 0;
 
-			break;
+		break;
 
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// OMNI
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// OMNI
 		case OMNI:
 
-			value1 = Premium_Omni.m3*Premium_Omni.l2;
-			value2 = Premium_Omni.m2*Premium_Omni.l1;
+			value1 = phState->Premium_Omni.m3*phState->Premium_Omni.l2;
+			value2 = phState->Premium_Omni.m2*phState->Premium_Omni.l1;
 
 			gravityForceVector[0] = 0;
 			gravityForceVector[1] = value1*sin(currentAngles.q2 + currentAngles.q3)
@@ -813,6 +840,24 @@ HDCallbackCode HDCALLBACK hdState(void *pState)
 
 		hdSetDoublev(HD_CURRENT_FORCE, phState->phGravityForce);
 		hdSetDoublev(HD_CURRENT_TORQUE, phState->phTorqe);
+
+	}
+
+	//////////////////////////////////////////////////////////////////////
+	// NO GRAVITY COMPENSATION
+	else{
+
+		phState->phGravityForce[0] = 0;
+		phState->phGravityForce[1] = 0;
+		phState->phGravityForce[2] = 0;
+
+		phState->phTorqe[0] = 0;
+		phState->phTorqe[1] = 0;
+		phState->phTorqe[2] = 0;
+
+		hdSetDoublev(HD_CURRENT_FORCE, phState->phGravityForce);
+		hdSetDoublev(HD_CURRENT_TORQUE, phState->phTorqe);
+
 	}
 
 	hdEndFrame(hdGetCurrentDevice());
