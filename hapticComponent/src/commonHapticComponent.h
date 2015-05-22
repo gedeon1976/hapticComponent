@@ -25,6 +25,10 @@ HapticComponent
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
+// include OpenCV for Jacobian Matrix calculus
+#include <opencv2\core.hpp>
+
+
 namespace ublas = boost::numeric::ublas;
 
 // typedef for the Six component Vector
@@ -36,7 +40,7 @@ typedef ublas::vector<mt::Scalar> Vect6;
 ///< OMNI			omni 6 d.o.f, 3 are actuated, orientation not
 enum hapticDevice {P1_5_6DOF = 0, P1_5_6DOF_HF = 1, OMNI = 2};
 
-const double gravityK = 9.8;
+const double gravityK = 9.81;
 
 /// some haptic parameters used for the gravity compensation
 /// for details see the Thesis of Carlos Aldana pages 94,99
@@ -99,7 +103,11 @@ struct HapticState{
 	HDdouble phGimbalJoints[3];
 	HDlong phMotorTorque[6];
 	hduVector3Dd phGravityForce;
+	hduVector3Dd phGravityTorqe;
 	HDboolean gravityEnable;
+
+	hduVector3Dd phCompensationForce;
+	hduVector3Dd phCompensationTorqe;
 
 	// workspace limits 
 	HDfloat Xmin;

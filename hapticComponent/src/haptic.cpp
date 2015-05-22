@@ -162,9 +162,9 @@ void Haptic::getGravityCompensation(CompensationForce &forceVector){
 	forceVector.f2 = m_phState->phGravityForce[1];
 	forceVector.f3 = m_phState->phGravityForce[2];
 
-	forceVector.f4 = m_phState->phTorqe[0];
-	forceVector.f5 = m_phState->phTorqe[1];
-	forceVector.f6 = m_phState->phTorqe[2];
+	forceVector.f4 = m_phState->phGravityTorqe[0];
+	forceVector.f5 = m_phState->phGravityTorqe[1];
+	forceVector.f6 = m_phState->phGravityTorqe[2];
 
 }
 
@@ -183,6 +183,172 @@ void Haptic::setGravityCompensation(bool &gravityEnable){
 		
 	}
 
+}
+
+// set the haptic force
+bool Haptic::setForce(const Vect6 force)
+{
+	if (m_init == false) return false;
+
+	m_phState->phForce[0] = mt::getValue(force[0]);
+	m_phState->phForce[1] = mt::getValue(force[1]);
+	m_phState->phForce[2] = mt::getValue(force[2]);
+
+	m_phState->phTorqe[0] = mt::getValue(force[3]);
+	m_phState->phTorqe[1] = mt::getValue(force[4]);
+	m_phState->phTorqe[2] = mt::getValue(force[5]);
+
+	return true;
+}
+
+// get the Jacobian for the haptic
+bool Haptic::getJacobian(ublas::matrix<mt::Scalar> &j)
+{
+	Vect6 q(6);
+	getJointPosition(q);
+
+	const mt::Scalar l1 = 0.21;
+	const mt::Scalar l2 = 0.21;
+
+	const mt::Scalar s1 = sin(q[0]);
+	const mt::Scalar s2 = sin(q[1]);
+	const mt::Scalar s3 = sin(q[2]);
+	const mt::Scalar s4 = sin(q[3]);
+	const mt::Scalar s5 = sin(q[4]);
+
+
+	const mt::Scalar c1 = cos(q[0]);
+	const mt::Scalar c2 = cos(q[1]);
+	const mt::Scalar c3 = cos(q[2]);
+	const mt::Scalar c4 = cos(q[3]);
+	const mt::Scalar c5 = cos(q[4]);
+
+	j.resize(6, 6);
+
+	j(0, 0) = c1*(l1*c1 + l2*s3);
+	j(1, 0) = 0.0;
+	j(2, 0) = -s1*(l1*c2 + l2*s3);
+
+	j(0, 1) = s1*(-l1*s2 + l2*c3);
+	j(1, 1) = l1*c2 + l2*s3;
+	j(2, 1) = c1*(-l1*s2 + l2*c3);
+
+	j(0, 2) = l2*s1*c3;
+	j(1, 2) = l2*s3;
+	j(2, 2) = l2*c1*c3;
+
+	j(0, 3) = 0.0;
+	j(1, 3) = 0.0;
+	j(2, 3) = 0.0;
+
+	j(0, 4) = 0.0;
+	j(1, 4) = 0.0;
+	j(2, 4) = 0.0;
+
+	j(0, 5) = 0.0;
+	j(1, 5) = 0.0;
+	j(2, 5) = 0.0;
+
+	j(3, 0) = 0.0;
+	j(4, 0) = 1.0;
+	j(5, 0) = 0.0;
+
+	j(3, 1) = -c1;
+	j(4, 1) = 0.0;
+	j(5, 1) = s1;
+
+	j(3, 2) = -c1;
+	j(4, 2) = 0.0;
+	j(5, 2) = s1;
+
+	j(3, 3) = s1*s3;
+	j(4, 3) = -c3;
+	j(5, 3) = c1*s3;
+
+	j(3, 4) = -s1*c3*s4 - c1*c4;
+	j(4, 4) = -s3*s4;
+	j(5, 4) = -c1*c3*s4 + s1*c4;
+
+	j(3, 5) = s1*c3*c4*c5 - c1*s4*c5 - s1*s3*s5;
+	j(4, 5) = s3*c4*c5 + c3*s5;
+	j(5, 5) = c1*c3*c4*c5 + s1*s4*c5 - c1*s3*s5;
+
+	return true;
+}
+
+// get the Jacobian transposed
+bool Haptic::getJacobianTranspose(ublas::matrix<mt::Scalar> &j)
+{
+	Vect6 q(6);
+	getJointPosition(q);
+
+	const mt::Scalar l1 = 0.21;
+	const mt::Scalar l2 = 0.21;
+
+	const mt::Scalar s1 = sin(q[0]);
+	const mt::Scalar s2 = sin(q[1]);
+	const mt::Scalar s3 = sin(q[2]);
+	const mt::Scalar s4 = sin(q[3]);
+	const mt::Scalar s5 = sin(q[4]);
+
+
+	const mt::Scalar c1 = cos(q[0]);
+	const mt::Scalar c2 = cos(q[1]);
+	const mt::Scalar c3 = cos(q[2]);
+	const mt::Scalar c4 = cos(q[3]);
+	const mt::Scalar c5 = cos(q[4]);
+
+	j.resize(6, 6);
+
+	j(0, 0) = c1*(l1*c1 + l2*s3);
+	j(0, 1) = 0.0;
+	j(0, 2) = -s1*(l1*c2 + l2*s3);
+
+	j(1, 0) = s1*(-l1*s2 + l2*c3);
+	j(1, 1) = l1*c2 + l2*s3;
+	j(1, 2) = c1*(-l1*s2 + l2*c3);
+
+	j(2, 0) = l2*s1*c3;
+	j(2, 1) = l2*s3;
+	j(2, 2) = l2*c1*c3;
+
+	j(3, 0) = 0.0;
+	j(3, 1) = 0.0;
+	j(3, 2) = 0.0;
+
+	j(4, 0) = 0.0;
+	j(4, 1) = 0.0;
+	j(4, 2) = 0.0;
+
+	j(5, 0) = 0.0;
+	j(5, 1) = 0.0;
+	j(5, 2) = 0.0;
+
+	j(0, 3) = 0.0;
+	j(0, 4) = 1.0;
+	j(0, 5) = 0.0;
+
+	j(1, 3) = -c1;
+	j(1, 4) = 0.0;
+	j(1, 5) = s1;
+
+	j(2, 3) = -c1;
+	j(2, 4) = 0.0;
+	j(2, 5) = s1;
+
+	j(3, 3) = s1*s3;
+	j(3, 4) = -c3;
+	j(3, 5) = c1*s3;
+
+	j(4, 3) = -s1*c3*s4 - c1*c4;
+	j(4, 4) = -s3*s4;
+	j(4, 5) = -c1*c3*s4 + s1*c4;
+
+	j(5, 3) = s1*c3*c4*c5 - c1*s4*c5 - s1*s3*s5;
+	j(5, 4) = s3*c4*c5 + c3*s5;
+	j(5, 5) = c1*c3*c4*c5 + s1*s4*c5 - c1*s3*s5;
+
+	return true;
 }
 
 // close the connection with the device
@@ -392,20 +558,7 @@ bool Haptic::getButton()
 	return false;
 }
 
-bool Haptic::setForce(const Vect6 force)
-{
-	if (m_init == false) return false;
 
-	m_phState->phForce[0] = mt::getValue(force[0]);
-	m_phState->phForce[1] = mt::getValue(force[1]);
-	m_phState->phForce[2] = mt::getValue(force[2]);
-
-	m_phState->phTorqe[0] = mt::getValue(force[3]);
-	m_phState->phTorqe[1] = mt::getValue(force[4]);
-	m_phState->phTorqe[2] = mt::getValue(force[5]);
-
-	return true;
-}
 
 bool Haptic::setMotorTorque(const Vect6 motorTorque)
 {
@@ -422,151 +575,6 @@ bool Haptic::setMotorTorque(const Vect6 motorTorque)
 }
 
 
-bool Haptic::getJacobian(ublas::matrix<mt::Scalar> &j)
-{
-	Vect6 q(6);
-	getJointPosition(q);
-
-	const mt::Scalar l1 = 0.215;
-	const mt::Scalar l2 = 0.170;
-
-	const mt::Scalar s1 = sin(q[0]);
-	const mt::Scalar s2 = sin(q[1]);
-	const mt::Scalar s3 = sin(q[2]);
-	const mt::Scalar s4 = sin(q[3]);
-	const mt::Scalar s5 = sin(q[4]);
-
-
-	const mt::Scalar c1 = cos(q[0]);
-	const mt::Scalar c2 = cos(q[1]);
-	const mt::Scalar c3 = cos(q[2]);
-	const mt::Scalar c4 = cos(q[3]);
-	const mt::Scalar c5 = cos(q[4]);
-
-
-	j(0, 0) = c1*(l1*c1 + l2*s3);
-	j(1, 0) = 0.0;
-	j(2, 0) = -s1*(l1*c2 + l2*s3);
-
-	j(0, 1) = s1*(-l1*s2 + l2*c3);
-	j(1, 1) = l1*c2 + l2*s3;
-	j(2, 1) = c1*(-l1*s2 + l2*c3);
-
-	j(0, 2) = l2*s1*c3;
-	j(1, 2) = l2*s3;
-	j(2, 2) = l2*c1*c3;
-
-	j(0, 3) = 0.0;
-	j(1, 3) = 0.0;
-	j(2, 3) = 0.0;
-
-	j(0, 4) = 0.0;
-	j(1, 4) = 0.0;
-	j(2, 4) = 0.0;
-
-	j(0, 5) = 0.0;
-	j(1, 5) = 0.0;
-	j(2, 5) = 0.0;
-
-	j(3, 0) = 0.0;
-	j(4, 0) = 1.0;
-	j(5, 0) = 0.0;
-
-	j(3, 1) = -c1;
-	j(4, 1) = 0.0;
-	j(5, 1) = s1;
-
-	j(3, 2) = -c1;
-	j(4, 2) = 0.0;
-	j(5, 2) = s1;
-
-	j(3, 3) = s1*s3;
-	j(4, 3) = -c3;
-	j(5, 3) = c1*s3;
-
-	j(3, 4) = -s1*c3*s4 - c1*c4;
-	j(4, 4) = -s3*s4;
-	j(5, 4) = -c1*c3*s4 + s1*c4;
-
-	j(3, 5) = s1*c3*c4*c5 - c1*s4*c5 - s1*s3*s5;
-	j(4, 5) = s3*c4*c5 + c3*s5;
-	j(5, 5) = c1*c3*c4*c5 + s1*s4*c5 - c1*s3*s5;
-
-	return true;
-}
-
-bool Haptic::getJacobianTranspose(ublas::matrix<mt::Scalar> &j)
-{
-	Vect6 q(6);
-	getJointPosition(q);
-
-	const mt::Scalar l1 = 0.215;
-	const mt::Scalar l2 = 0.170;
-
-	const mt::Scalar s1 = sin(q[0]);
-	const mt::Scalar s2 = sin(q[1]);
-	const mt::Scalar s3 = sin(q[2]);
-	const mt::Scalar s4 = sin(q[3]);
-	const mt::Scalar s5 = sin(q[4]);
-
-
-	const mt::Scalar c1 = cos(q[0]);
-	const mt::Scalar c2 = cos(q[1]);
-	const mt::Scalar c3 = cos(q[2]);
-	const mt::Scalar c4 = cos(q[3]);
-	const mt::Scalar c5 = cos(q[4]);
-
-
-	j(0, 0) = c1*(l1*c1 + l2*s3);
-	j(0, 1) = 0.0;
-	j(0, 2) = -s1*(l1*c2 + l2*s3);
-
-	j(1, 0) = s1*(-l1*s2 + l2*c3);
-	j(1, 1) = l1*c2 + l2*s3;
-	j(1, 2) = c1*(-l1*s2 + l2*c3);
-
-	j(2, 0) = l2*s1*c3;
-	j(2, 1) = l2*s3;
-	j(2, 2) = l2*c1*c3;
-
-	j(3, 0) = 0.0;
-	j(3, 1) = 0.0;
-	j(3, 2) = 0.0;
-
-	j(4, 0) = 0.0;
-	j(4, 1) = 0.0;
-	j(4, 2) = 0.0;
-
-	j(5, 0) = 0.0;
-	j(5, 1) = 0.0;
-	j(5, 2) = 0.0;
-
-	j(0, 3) = 0.0;
-	j(0, 4) = 1.0;
-	j(0, 5) = 0.0;
-
-	j(1, 3) = -c1;
-	j(1, 4) = 0.0;
-	j(1, 5) = s1;
-
-	j(2, 3) = -c1;
-	j(2, 4) = 0.0;
-	j(2, 5) = s1;
-
-	j(3, 3) = s1*s3;
-	j(3, 4) = -c3;
-	j(3, 5) = c1*s3;
-
-	j(4, 3) = -s1*c3*s4 - c1*c4;
-	j(4, 4) = -s3*s4;
-	j(4, 5) = -c1*c3*s4 + s1*c4;
-
-	j(5, 3) = s1*c3*c4*c5 - c1*s4*c5 - s1*s3*s5;
-	j(5, 4) = s3*c4*c5 + c3*s5;
-	j(5, 5) = c1*c3*c4*c5 + s1*s4*c5 - c1*s3*s5;
-
-	return true;
-}
 
 
 
@@ -750,7 +758,7 @@ HDCallbackCode HDCALLBACK hdState(void *pState)
 		hapticDeviceID = 1;
 	}
 
-	if (hapticType.compare("Omni") == 0){
+	if (hapticType.compare("PHANTOM Omni") == 0){
 
 		hapticDeviceID = 2;
 	}
@@ -830,16 +838,19 @@ HDCallbackCode HDCALLBACK hdState(void *pState)
 		}
 
 		// set the compensation force and torque for the device
-		phState->phGravityForce[0] = gravityK*gravityForceVector[0];
-		phState->phGravityForce[1] = gravityK*gravityForceVector[1];
-		phState->phGravityForce[2] = gravityK*gravityForceVector[2];
+		phState->phGravityForce[0] = gravityK*gravityForceVector[0] + F[0];
+		phState->phGravityForce[1] = gravityK*gravityForceVector[1] + F[1];
+		phState->phGravityForce[2] = gravityK*gravityForceVector[2] + F[2];
 
-		phState->phTorqe[0] = gravityK*gravityForceVector[3];
-		phState->phTorqe[1] = gravityK*gravityForceVector[4];
-		phState->phTorqe[2] = gravityK*gravityForceVector[5];
+		phState->phGravityTorqe[0] = gravityK*gravityForceVector[3];
+		phState->phGravityTorqe[1] = gravityK*gravityForceVector[4];
+		phState->phGravityTorqe[2] = gravityK*gravityForceVector[5];
+
+
+		// set the control compensation force + cubic limits
 
 		hdSetDoublev(HD_CURRENT_FORCE, phState->phGravityForce);
-		hdSetDoublev(HD_CURRENT_TORQUE, phState->phTorqe);
+		hdSetDoublev(HD_CURRENT_TORQUE, phState->phGravityTorqe);
 
 	}
 
@@ -847,16 +858,18 @@ HDCallbackCode HDCALLBACK hdState(void *pState)
 	// NO GRAVITY COMPENSATION
 	else{
 
-		phState->phGravityForce[0] = 0;
-		phState->phGravityForce[1] = 0;
-		phState->phGravityForce[2] = 0;
+		phState->phGravityForce[0] = F[0];
+		phState->phGravityForce[1] = F[1];
+		phState->phGravityForce[2] = F[2];
 
-		phState->phTorqe[0] = 0;
-		phState->phTorqe[1] = 0;
-		phState->phTorqe[2] = 0;
+		phState->phGravityTorqe[0] = 0;
+		phState->phGravityTorqe[1] = 0;
+		phState->phGravityTorqe[2] = 0;
 
+		// set the control compensation force + cubic limits
+		
 		hdSetDoublev(HD_CURRENT_FORCE, phState->phGravityForce);
-		hdSetDoublev(HD_CURRENT_TORQUE, phState->phTorqe);
+		hdSetDoublev(HD_CURRENT_TORQUE, phState->phGravityTorqe);
 
 	}
 

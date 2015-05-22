@@ -51,7 +51,7 @@ public:
 	/// @param[in,out] maxCubeLimits maximum size for the cune workspace
 	virtual void getWorkSpaceLimits(mt::Vector3 MinCubicLimits, mt::Vector3 MaxCubicLimits) = 0;
 
-	/// get the traslation and orientation on yaw,pitch, roll representation from the haptic
+	/// get the translation and orientation on yaw,pitch, roll representation from the haptic
 	/// @param[in,out] hapticPosition save the haptic position in original coordinates or device coordinates
 	virtual void getHapticPosition(mt::Transform &hapticPosition) = 0;
 
@@ -62,6 +62,17 @@ public:
 	/// set the gravity compensation ON or OFF
 	/// @param[in] gravityEnable boolean flag to indicate enabling or disabling the gravity compensation
 	virtual void setGravityCompensation(bool &gravityEnable) = 0;
+
+	/// set the force at the haptic pose and torque joints
+	/// @param[in,out] const Vect6 it contains the forces to be set to the haptic
+	virtual bool setForce(const Vect6) = 0;
+
+	/// get the jacobian 
+	/// @param[in,out] ublas::matrix<mt::Scalar> Matrix that contains the Jacobian
+	virtual bool getJacobian(ublas::matrix<mt::Scalar> &Jacobian) = 0;
+
+	/// get the jacobian Transpose 
+	virtual bool getJacobianTranspose(ublas::matrix<mt::Scalar> &JacobianT) = 0;
 
 	/// close the connection with the haptic device
 	virtual void closeConnection() = 0;

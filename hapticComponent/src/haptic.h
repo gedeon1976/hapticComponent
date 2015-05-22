@@ -41,6 +41,9 @@ public:
 	void getHapticPosition(mt::Transform &hapticPosition);
 	void getGravityCompensation(CompensationForce &forceVector);
 	void setGravityCompensation(bool &gravityEnable);
+	bool setForce(const Vect6);
+	bool getJacobian(ublas::matrix<mt::Scalar> &Jacobian);
+	bool getJacobianTranspose(ublas::matrix<mt::Scalar> &JacobianT);
 	void closeConnection();
 
 
@@ -83,10 +86,6 @@ private:
 	/// @param[in,out] Vect6 contains the speeds of haptic Pose and torque joints
 	bool getVelocity(Vect6 &);
 
-	/// set the force at the haptic pose and torque joints
-	/// @param[in,out] const Vect6 it contains the forces to be set to the haptic
-	bool setForce(const Vect6);
-
 	/// get the state of the stylus button
 	bool getButton();
 
@@ -102,12 +101,7 @@ private:
 	/// @param[in,out] Vect6 it contains the torque to be set at each joint motor
 	bool setMotorTorque(const Vect6);
 
-	/// get the jacobian 
-	/// @param[in,out] ublas::matrix<mt::Scalar> Matrix that contains the Jacobian
-	bool getJacobian(ublas::matrix<mt::Scalar> &);
-
-	/// get the jacobian Transpose 
-	bool getJacobianTranspose(ublas::matrix<mt::Scalar> &);
+	
 
 	
 };
