@@ -791,7 +791,7 @@ HDCallbackCode HDCALLBACK hdState(void *pState)
 		break;
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//   Premium 1.5 6 D.O.F
+		//   Premium 1.5 6 D.O.F HF
 		case P1_5_6DOF_HF:
 
 			value1 = phState->Premium_1_5_6DOF_HF.m2*phState->Premium_1_5_6DOF_HF.lc2 + phState->Premium_1_5_6DOF_HF.m3*phState->Premium_1_5_6DOF_HF.l2;
@@ -799,12 +799,12 @@ HDCallbackCode HDCALLBACK hdState(void *pState)
 			value3 = phState->Premium_1_5_6DOF_HF.m3*phState->Premium_1_5_6DOF_HF.lc3;
 
 			gravityForceVector[0] = 0;
-			gravityForceVector[1] = (phState->Premium_1_5_6DOF_HF.m1*phState->Premium_1_5_6DOF_HF.lc1 + phState->Premium_1_5_6DOF_HF.m2*phState->Premium_1_5_6DOF_HF.l1
+			gravityForceVector[1] = g*(phState->Premium_1_5_6DOF_HF.m1*phState->Premium_1_5_6DOF_HF.lc1 + phState->Premium_1_5_6DOF_HF.m2*phState->Premium_1_5_6DOF_HF.l1
 				+ phState->Premium_1_5_6DOF_HF.m3*phState->Premium_1_5_6DOF_HF.l1)*cos(currentAngles.q2)
-				+ value1*sin(currentAngles.q3) + value2*cos(currentAngles.q3 + currentAngles.q5);
-			gravityForceVector[2] = value1*sin(currentAngles.q3) + value3*cos(currentAngles.q3 + currentAngles.q5);
-			gravityForceVector[3] = value3*sin(currentAngles.q3 + currentAngles.q5)*sin(currentAngles.q4);
-			gravityForceVector[4] = value3*cos(currentAngles.q3)*cos(currentAngles.q5);
+				+ g*value1*sin(currentAngles.q3) + g*value2*cos(currentAngles.q3 + currentAngles.q5);
+			gravityForceVector[2] = g*value1*sin(currentAngles.q3) + g*value3*cos(currentAngles.q3 + currentAngles.q5);
+			gravityForceVector[3] = -g*value3*sin(currentAngles.q3 + currentAngles.q5)*sin(currentAngles.q4);
+			gravityForceVector[4] = g*value3*cos(currentAngles.q3)*cos(currentAngles.q5);
 			gravityForceVector[5] = 0;
 
 		break;
@@ -838,13 +838,13 @@ HDCallbackCode HDCALLBACK hdState(void *pState)
 		}
 
 		// set the compensation force and torque for the device
-		phState->phGravityForce[0] = gravityK*gravityForceVector[0] + F[0];
-		phState->phGravityForce[1] = gravityK*gravityForceVector[1] + F[1];
-		phState->phGravityForce[2] = gravityK*gravityForceVector[2] + F[2];
+		phState->phGravityForce[0] = gravityForceVector[0];// +F[0];
+		phState->phGravityForce[1] = gravityForceVector[1];// +F[1];
+		phState->phGravityForce[2] = gravityForceVector[2];// +F[2];
 
-		phState->phGravityTorqe[0] = gravityK*gravityForceVector[3];
-		phState->phGravityTorqe[1] = gravityK*gravityForceVector[4];
-		phState->phGravityTorqe[2] = gravityK*gravityForceVector[5];
+		phState->phGravityTorqe[0] = gravityForceVector[3];
+		phState->phGravityTorqe[1] = gravityForceVector[4];
+		phState->phGravityTorqe[2] = gravityForceVector[5];
 
 
 		// set the control compensation force + cubic limits
