@@ -201,6 +201,19 @@ bool Haptic::setForce(const Vect6 force)
 	return true;
 }
 
+// set the gain for Ka
+void Haptic::setKa(double Ka)
+{
+	m_phState->Ka = Ka;
+}
+
+// set the gain for Kd
+void Haptic::setKd(double Kd)
+{
+	m_phState->Kd = Kd; 
+
+}
+
 // get the Jacobian for the haptic
 bool Haptic::getJacobian(ublas::matrix<mt::Scalar> &j)
 {
@@ -415,8 +428,14 @@ bool Haptic::start(){
 
 	if (m_init == false) return false;
 
+	// Gains for gravity compensation (Experimental values)
+	m_phState->Ka = 2.51;
+	m_phState->Kd = 0.001;
+
 	hdScheduleAsynchronous(hdState, (void *)m_phState, HD_MAX_SCHEDULER_PRIORITY);
 	//hdScheduleAsynchronous(FrictionlessPlaneCallback, (void *)m_phState, HD_MAX_SCHEDULER_PRIORITY);
+
+	hdEnable(HD_FORCE_OUTPUT);
 
 	hdStartScheduler();
 
@@ -580,6 +599,8 @@ bool Haptic::setMotorTorque(const Vect6 motorTorque)
 
 HDCallbackCode HDCALLBACK hdState(void *pState)
 {
+	HDErrorInfo error;
+
 	HapticState *phState = (HapticState *)pState;
 	// Stiffnes, i.e. k value, of the plane.  Higher stiffness results
 	// in a harder surface.
@@ -599,6 +620,7 @@ HDCallbackCode HDCALLBACK hdState(void *pState)
 
 	// start haptic frame
 	hdBeginFrame(hdGetCurrentDevice());
+
 	hdGetIntegerv(HD_CURRENT_BUTTONS, &phState->phButton);
 	hdGetDoublev(HD_CURRENT_TRANSFORM, phState->phPos);
 	hdGetDoublev(HD_CURRENT_JOINT_ANGLES, phState->phBaseJoints);
@@ -731,10 +753,12 @@ HDCallbackCode HDCALLBACK hdState(void *pState)
 	// Add the gravity compensation force vector
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
+	
 	HDdouble gravityForceVector[6];
 	jointAngles currentAngles;
 	double value1 = 0, value2 = 0, value3 = 0;
 	int hapticDeviceID= 1000;
+
 
 	// get the current joint positions
 	currentAngles.q1 = phState->phBaseJoints[0];
@@ -757,7 +781,7 @@ HDCallbackCode HDCALLBACK hdState(void *pState)
 
 		hapticDeviceID = 1;
 	}
-
+	 
 	if (hapticType.compare("PHANTOM Omni") == 0){
 
 		hapticDeviceID = 2;
@@ -780,12 +804,12 @@ HDCallbackCode HDCALLBACK hdState(void *pState)
 			value3 = phState->Premium_1_5_6DOF.m3*phState->Premium_1_5_6DOF.lc3;
 
 			gravityForceVector[0] = 0;
-			gravityForceVector[1] = (phState->Premium_1_5_6DOF.m1*phState->Premium_1_5_6DOF.lc1 + phState->Premium_1_5_6DOF.m2*phState->Premium_1_5_6DOF.l1
+			gravityForceVector[1] = g*(phState->Premium_1_5_6DOF.m1*phState->Premium_1_5_6DOF.lc1 + phState->Premium_1_5_6DOF.m2*phState->Premium_1_5_6DOF.l1
 				+ phState->Premium_1_5_6DOF.m3*phState->Premium_1_5_6DOF.l1)*cos(currentAngles.q2)
-				+ value1*sin(currentAngles.q3) + value2*cos(currentAngles.q3 + currentAngles.q5);
-			gravityForceVector[2] = value1*sin(currentAngles.q3) + value3*cos(currentAngles.q3 + currentAngles.q5);
-			gravityForceVector[3] = value3*sin(currentAngles.q3 + currentAngles.q5)*sin(currentAngles.q4);
-			gravityForceVector[4] = value3*cos(currentAngles.q3)*cos(currentAngles.q5);
+				+ g*value1*sin(currentAngles.q3) + g*value2*cos(currentAngles.q3 + currentAngles.q5);
+			gravityForceVector[2] = g*value1*sin(currentAngles.q3) + g*value3*cos(currentAngles.q3 + currentAngles.q5);
+			gravityForceVector[3] = -g*value3*sin(currentAngles.q3 + currentAngles.q5)*sin(currentAngles.q4);
+			gravityForceVector[4] = g*value3*cos(currentAngles.q3)*cos(currentAngles.q5);
 			gravityForceVector[5] = 0;
 
 		break;
@@ -838,13 +862,15 @@ HDCallbackCode HDCALLBACK hdState(void *pState)
 		}
 
 		// set the compensation force and torque for the device
-		phState->phGravityForce[0] = gravityForceVector[0];// +F[0];
-		phState->phGravityForce[1] = gravityForceVector[1];// +F[1];
-		phState->phGravityForce[2] = gravityForceVector[2];// +F[2];
+		double ka = phState->Ka;
+		double kd = phState->Kd;
+		phState->phGravityForce[0] = ka*gravityForceVector[0] + kd*phState->phVel[0];
+		phState->phGravityForce[1] = ka*gravityForceVector[1] - kd*phState->phVel[1];
+		phState->phGravityForce[2] = ka*gravityForceVector[2] - kd*phState->phVel[2];
 
-		phState->phGravityTorqe[0] = gravityForceVector[3];
-		phState->phGravityTorqe[1] = gravityForceVector[4];
-		phState->phGravityTorqe[2] = gravityForceVector[5];
+		phState->phGravityTorqe[0] = ka*gravityForceVector[3];
+		phState->phGravityTorqe[1] = ka*gravityForceVector[4];
+		phState->phGravityTorqe[2] = ka*gravityForceVector[5];
 
 
 		// set the control compensation force + cubic limits
@@ -852,6 +878,20 @@ HDCallbackCode HDCALLBACK hdState(void *pState)
 		hdSetDoublev(HD_CURRENT_FORCE, phState->phGravityForce);
 		hdSetDoublev(HD_CURRENT_TORQUE, phState->phGravityTorqe);
 
+		//std::cout << "q1: " << currentAngles.q1
+		//	<< "q2: " << currentAngles.q2
+		//	<< "q3: " << currentAngles.q3
+		//	<< "q4: " << currentAngles.q4
+		//	<< "q5: " << currentAngles.q5
+		//	<< "q6: " << currentAngles.q6 << '\n' << std::endl;
+
+		//std::cout << "g1: " << phState->phGravityForce[0]
+		//	<< "g2: " << phState->phGravityForce[1]
+		//	<< "g3: " << phState->phGravityForce[2]
+		//	<< "g4: " << phState->phGravityTorqe[0]
+		//	<< "g5: " << phState->phGravityTorqe[1]
+		//	<< "g6: " << phState->phGravityTorqe[2] << '\n' << std::endl;
+				
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -877,6 +917,7 @@ HDCallbackCode HDCALLBACK hdState(void *pState)
 
 	//Execute this for ever. Use HD_CALLBACK_ONCE for one time check
 	return HD_CALLBACK_CONTINUE;
+
 }
 
 

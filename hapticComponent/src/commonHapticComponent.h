@@ -19,7 +19,8 @@ HapticComponent
 //HD headers from the Open Haptics
 #include <HD/hd.h>
 #include <HDU/hduVector.h>
-//#include <HDU/hduError.h>
+#include <HDU/hduError.h>
+
 
 //uBLAS library
 #include <boost/numeric/ublas/matrix.hpp>
@@ -27,6 +28,7 @@ HapticComponent
 
 // include OpenCV for Jacobian Matrix calculus
 #include <opencv2\core.hpp>
+#include <opencv2\highgui.hpp>
 
 
 namespace ublas = boost::numeric::ublas;
@@ -108,6 +110,10 @@ struct HapticState{
 
 	hduVector3Dd phCompensationForce;
 	hduVector3Dd phCompensationTorqe;
+
+	// control gains
+	double Ka;			// to convert from Nm to nNm (Used by Carlos's Aldana PhanTorque Libraries)
+	double Kd;			// for damping PD control
 
 	// workspace limits 
 	HDfloat Xmin;

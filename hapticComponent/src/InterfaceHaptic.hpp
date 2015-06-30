@@ -67,6 +67,11 @@ public:
 	/// @param[in,out] const Vect6 it contains the forces to be set to the haptic
 	virtual bool setForce(const Vect6) = 0;
 
+	/// set the ka and Kd gains to stabilize gravity compensation
+	virtual void setKa(double Ka) = 0;
+
+	virtual void setKd(double kd) = 0;
+
 	/// get the jacobian 
 	/// @param[in,out] ublas::matrix<mt::Scalar> Matrix that contains the Jacobian
 	virtual bool getJacobian(ublas::matrix<mt::Scalar> &Jacobian) = 0;

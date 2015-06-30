@@ -42,6 +42,8 @@ public:
 	void getGravityCompensation(CompensationForce &forceVector);
 	void setGravityCompensation(bool &gravityEnable);
 	bool setForce(const Vect6);
+	void setKa(double Ka);
+	void setKd(double kd);
 	bool getJacobian(ublas::matrix<mt::Scalar> &Jacobian);
 	bool getJacobianTranspose(ublas::matrix<mt::Scalar> &JacobianT);
 	void closeConnection();

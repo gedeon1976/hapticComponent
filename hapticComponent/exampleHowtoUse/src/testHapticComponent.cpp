@@ -3,7 +3,9 @@
 //the device is a phantom 1.5 6 d.o.f High Force
 		
 	#include "HapticAccess.h"
-	
+	#include <opencv2\highgui.hpp>
+    #include <conio.h>	
+
 	using namespace std;
 	
 	int main(int argc, char ** argv)
@@ -40,23 +42,56 @@
 
 	// call the methods from the Haptic Component
 	HapticComponent->startConnection();
-	//HapticComponent->setWorkSpaceLimits(MinCubicLimits, MaxCubicLimits);
+	HapticComponent->setWorkSpaceLimits(MinCubicLimits, MaxCubicLimits);
 	HapticComponent->setGravityCompensation(enableGravity);
+
+	// test Haptic gains
+	double Ka = 2.5;
+	double Kd = 0.001;
+	int ka_in, kd_in;
+	int key;
 
 	while (1)
 	{
+					
+		key = getch();	
+		
+		switch (key)
+		{
+		case 97:
+			Ka = Ka + 0.01;
+			std::cout << "Ka Value= %f \n" << Ka << std::endl;
+			break;
+		case 115:
+			Ka = Ka - 0.01;
+			std::cout << "Ka Value=  %f \n" << Ka << std::endl;
+			break;
+		case 100:
+			Kd = Kd + 0.0001;
+			std::cout << "Kd Value= %f \n" << Kd << std::endl;
+			break;
+		case 102:
+			Kd = Kd - 0.0001;
+			std::cout << "Kd Value= %f" << Kd << std::endl;
+			break;
+		}
 
+		HapticComponent->setKa(Ka);
+		HapticComponent->setKd(Kd);		
+	
+		
+		
 		// get the haptic position
-		HapticComponent->getHapticPosition(hapticPosition);
-		position = hapticPosition.getTranslation();
-		cout << " X: " << position[0] << " Y: " << position[1] << " Z: " << position[2] << "\n" << endl;
+		//HapticComponent->getHapticPosition(hapticPosition);
+		//position = hapticPosition.getTranslation();
+		//cout << " X: " << position[0] << " Y: " << position[1] << " Z: " << position[2] << "\n" << endl;
 
-		HapticComponent->getGravityCompensation(gravityForce);
-		cout << "compensation gravity Force \n" << endl;
-		cout << " f1: " << gravityForce.f1 << " f2: " << gravityForce.f2 <<
+		//HapticComponent->getGravityCompensation(gravityForce);
+		//cout << "compensation gravity Force \n" << endl;
+		/* cout << " f1: " << gravityForce.f1 << " f2: " << gravityForce.f2 <<
 			    " f3: " << gravityForce.f3 << " f4: " << gravityForce.f4 <<
 			    " f5: " << gravityForce.f5 << " f6: " << gravityForce.f6 << "\n" << endl;
-
+				*/
 		// set the control compensation force
 		//HapticComponent->getJacobian(Jacobian);
 		//HapticComponent->getJacobianTranspose(JacobianT);
