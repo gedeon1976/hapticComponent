@@ -46,7 +46,7 @@
 	HapticComponent->setGravityCompensation(enableGravity);
 
 	// test Haptic gains
-	double Ka = 2.5;
+	double Ka = 1000;
 	double Kd = 0.001;
 	int ka_in, kd_in;
 	int key;
@@ -54,16 +54,16 @@
 	while (1)
 	{
 					
-		key = getch();	
-		
+		//key = getch();	
+		key = 0;
 		switch (key)
 		{
 		case 97:
-			Ka = Ka + 0.01;
+			Ka = Ka + 25;
 			std::cout << "Ka Value= %f \n" << Ka << std::endl;
 			break;
 		case 115:
-			Ka = Ka - 0.01;
+			Ka = Ka - 25;
 			std::cout << "Ka Value=  %f \n" << Ka << std::endl;
 			break;
 		case 100:
@@ -82,9 +82,9 @@
 		
 		
 		// get the haptic position
-		//HapticComponent->getHapticPosition(hapticPosition);
-		//position = hapticPosition.getTranslation();
-		//cout << " X: " << position[0] << " Y: " << position[1] << " Z: " << position[2] << "\n" << endl;
+		HapticComponent->getHapticPosition(hapticPosition);
+		position = hapticPosition.getTranslation();
+		cout << " X: " << position[0] << " Y: " << position[1] << " Z: " << position[2] << "\n" << endl;
 
 		//HapticComponent->getGravityCompensation(gravityForce);
 		//cout << "compensation gravity Force \n" << endl;
