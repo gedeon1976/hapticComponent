@@ -55,7 +55,8 @@
 	{
 					
 		key = getch();	
-		//key = 0;
+
+	
 		switch (key)
 		{
 		case 97:
