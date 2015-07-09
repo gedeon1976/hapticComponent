@@ -429,8 +429,8 @@ bool Haptic::start(){
 	if (m_init == false) return false;
 
 	// Gains for gravity compensation (Experimental values)
-	m_phState->Ka = 2.51;
-	m_phState->Kd = 0.001;
+	m_phState->Ka = 1000;			// for mNm, used to compensate scale, because HD_CURRENT_JOINT_TORQUE
+	m_phState->Kd = 0.0005;
 
 	hdScheduleAsynchronous(hdState, (void *)m_phState, HD_MAX_SCHEDULER_PRIORITY);
 	//hdScheduleAsynchronous(FrictionlessPlaneCallback, (void *)m_phState, HD_MAX_SCHEDULER_PRIORITY);
@@ -604,7 +604,7 @@ HDCallbackCode HDCALLBACK hdState(void *pState)
 	HapticState *phState = (HapticState *)pState;
 	// Stiffnes, i.e. k value, of the plane.  Higher stiffness results
 	// in a harder surface.
-	const double planeStiffness = 1;
+	const double planeStiffness = 1.0;
 	// Amount of force the user needs to apply in order to pop through
 	// the plane.
 	const double popthroughForceThreshold = 25.0;
@@ -618,6 +618,14 @@ HDCallbackCode HDCALLBACK hdState(void *pState)
 	static int directionFlagZ = 1, directionFlagZ_bottom = 1, directionFlagZ_top = -1;
 	float X_limit = 0, Y_limit = 0, Z_limit = 0;
 
+
+	phState->phForce[0] = 0;
+	phState->phForce[1] = 0;
+	phState->phForce[2] = 0;
+	phState->phTorqe[0] = 0;
+	phState->phTorqe[1] = 0;
+	phState->phTorqe[2] = 0;
+
 	// start haptic frame
 	hdBeginFrame(hdGetCurrentDevice());
 
@@ -627,10 +635,7 @@ HDCallbackCode HDCALLBACK hdState(void *pState)
 	hdGetDoublev(HD_CURRENT_GIMBAL_ANGLES, phState->phGimbalJoints);
 	hdGetDoublev(HD_CURRENT_VELOCITY, phState->phVel);
 	hdGetDoublev(HD_CURRENT_ANGULAR_VELOCITY, phState->phAngVel);
-	hdSetDoublev(HD_CURRENT_FORCE, phState->phForce);
-	hdSetDoublev(HD_CURRENT_TORQUE, phState->phTorqe);
-	//hdSetLongv(HD_CURRENT_MOTOR_DAC_VALUES, phState->phMotorTorque);
-
+		
 	// ADD CUBIC WORKSPACE LIMITS
 	// Get the position of the device.
 	hduVector3Dd position;
@@ -753,7 +758,6 @@ HDCallbackCode HDCALLBACK hdState(void *pState)
 	// Add the gravity compensation force vector
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	
 	HDdouble gravityForceVector[6];
 	jointAngles currentAngles;
 	double value1 = 0, value2 = 0, value3 = 0;
@@ -864,9 +868,9 @@ HDCallbackCode HDCALLBACK hdState(void *pState)
 		// set the compensation force and torque for the device
 		double ka = phState->Ka;
 		double kd = phState->Kd;
-		phState->phGravityForce[0] = ka*gravityForceVector[0] + kd*phState->phVel[0];
-		phState->phGravityForce[1] = ka*gravityForceVector[1] - kd*phState->phVel[1];
-		phState->phGravityForce[2] = ka*gravityForceVector[2] - kd*phState->phVel[2];
+		phState->phGravityForce[0] = ka*(gravityForceVector[0] + kd*phState->phVel[0]);
+		phState->phGravityForce[1] = ka*(gravityForceVector[1] - kd*phState->phVel[1]);
+		phState->phGravityForce[2] = ka*(gravityForceVector[2] - kd*phState->phVel[2]);
 
 		phState->phGravityTorqe[0] = ka*gravityForceVector[3];
 		phState->phGravityTorqe[1] = ka*gravityForceVector[4];
@@ -875,8 +879,9 @@ HDCallbackCode HDCALLBACK hdState(void *pState)
 
 		// set the control compensation force + cubic limits
 
-		hdSetDoublev(HD_CURRENT_FORCE, phState->phGravityForce);
-		hdSetDoublev(HD_CURRENT_TORQUE, phState->phGravityTorqe);
+		hdSetDoublev(HD_CURRENT_JOINT_TORQUE, phState->phGravityForce);
+		hdSetDoublev(HD_CURRENT_GIMBAL_TORQUE, phState->phGravityTorqe);
+		hdSetDoublev(HD_CURRENT_FORCE,F);
 
 		//std::cout << "q1: " << currentAngles.q1
 		//	<< "q2: " << currentAngles.q2
@@ -898,19 +903,16 @@ HDCallbackCode HDCALLBACK hdState(void *pState)
 	// NO GRAVITY COMPENSATION
 	else{
 
-		phState->phGravityForce[0] = F[0];
-		phState->phGravityForce[1] = F[1];
-		phState->phGravityForce[2] = F[2];
+		phState->phGravityForce[0] = 0;
+		phState->phGravityForce[1] = 0;
+		phState->phGravityForce[2] = 0;
 
 		phState->phGravityTorqe[0] = 0;
 		phState->phGravityTorqe[1] = 0;
 		phState->phGravityTorqe[2] = 0;
 
-		// set the control compensation force + cubic limits
-		
-		hdSetDoublev(HD_CURRENT_FORCE, phState->phGravityForce);
-		hdSetDoublev(HD_CURRENT_TORQUE, phState->phGravityTorqe);
-
+		// set the cubic limits
+		hdSetDoublev(HD_CURRENT_FORCE, F);
 	}
 
 	hdEndFrame(hdGetCurrentDevice());
